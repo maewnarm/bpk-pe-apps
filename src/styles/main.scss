@@ -1,0 +1,31 @@
+@use 'layout';
+@use 'otsm';
+@import 'bulma/css/bulma.css';
+
+.index-page {
+    min-width: max(720px, 90%);
+    margin: 0 auto;
+    min-height: max(400px, 70vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.welcome-message {
+    text-align: center;
+    p {
+        &:first-child {
+            font-size: max(2.75vw, 2rem);
+            margin-bottom: 0;
+        }
+        &:last-child {
+            font-size: max(2vw, 1.5rem);
+            margin: 0;
+        }
+    }
+    strong {
+        font-size: max(3.5vw, 3.5rem);
+    }
+}
+

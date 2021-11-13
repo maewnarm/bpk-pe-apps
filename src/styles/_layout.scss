@@ -1,0 +1,53 @@
+a {
+    color: black;
+    &:hover {
+        background-color: rgba(30, 30, 30, 0.2);
+    }
+}
+
+.main {
+    min-width: max(720px, 90%);
+    margin: 0 auto;
+    min-height: max(400px, 70vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.navbar {
+    display: flex;
+    flex-direction: column;
+    min-width: max(calc(720px + 10%), 100%);
+    margin: 0 auto;
+    height: 3rem;
+    background-color: pink;
+    position: sticky;
+    top: 0;
+}
+
+.navbar__top {
+    width: 100%;
+}
+
+.navbar__language {
+    margin: 0.25rem 0.5rem 0 auto;
+    width: fit-content;
+}
+
+.navbar__link {
+    display: flex;
+    justify-content: space-evenly;
+    a {
+        padding: 0 0.2rem;
+        font-weight: bold;
+    }
+}
+
+.footer {
+    display: flex;
+    flex: 1;
+    padding: 2rem 0;
+    border-top: 1px solid #eaeaea;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,0 +1,31 @@
+.is-hide {
+    visibility: hidden;
+}
+
+.otsm__grid-container {
+    width: 90%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+}
+
+.otsm__selector {
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+}
+
+.otsm__dropdown__button {
+    min-width: 200px;
+    span:first-child {
+        width: 100%;
+        text-align: left;
+    }
+    .icon {
+        margin-left: auto;
+    }
+}
+
+.otsm__dropdown__a.is-active{
+    background-color: #00d1b2 !important;
+}
