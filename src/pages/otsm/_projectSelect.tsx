@@ -16,8 +16,8 @@ const ProjectSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
     return (
         <div className="otsm__selector">
             <label className="label">Project group :</label>
-            <div className="otsm__project otsm__dropdown dropdown" onClick={toggleDropdown}>
-                <div className="dropdown-trigger">
+            <div className="otsm__project__dropdown dropdown">
+                <div className="otsm__project__dropdown dropdown-trigger"  onClick={toggleDropdown} onBlur={toggleDropdown}>
                     <button className="otsm__project otsm__dropdown__button button is-outlined is-danger" aria-haspopup="true" aria-controls="dropdown-menu">
                         <span><i>{selectedProject}</i></span>
                         <span className="icon is-small">
@@ -27,7 +27,7 @@ const ProjectSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
                 </div>
                 <div className="dropdown-menu" id="dropdown-menu" role="menu">
                     <div className="dropdown-content">
-                        <a className="otsm__project otsm__dropdown__a 1 dropdown-item" onClick={(e: React.MouseEvent) => {
+                        <a className="otsm__project otsm__dropdown__item 1 dropdown-item" onClick={(e: React.MouseEvent) => {
                             toggleContent(e, 1)
                             setSelectedProject(e.currentTarget.innerHTML)
                             setProjectSelected(true)

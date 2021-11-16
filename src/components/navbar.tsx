@@ -48,15 +48,16 @@ const Navbar = () => {
 
     return (
         <div className="navbar">
-            <div className="navbar__top">
-                <div className="navbar__language">
-                    {languageBtn()}
-                </div>
-            </div>
+            <a href="/" className="denso-logo">
+                <img src="denso-vector-logo.svg" />
+            </a>
             <div className="navbar__link">
                 <Link href="/">{t('menu.home')}</Link>
                 <Link href="/main">{t('menu.main')}</Link>
                 <Link href="/otsm">{t('menu.otsm')}</Link>
+            </div>
+            <div className="navbar__language">
+                {languageBtn()}
             </div>
         </div>
     )

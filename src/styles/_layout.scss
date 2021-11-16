@@ -1,8 +1,7 @@
+@import "variables";
+
 a {
     color: black;
-    &:hover {
-        background-color: rgba(30, 30, 30, 0.2);
-    }
 }
 
 .main {
@@ -16,30 +15,75 @@ a {
 
 .navbar {
     display: flex;
-    flex-direction: column;
-    min-width: max(calc(720px + 10%), 100%);
+    align-items: center;
+    min-width: 100%;
     margin: 0 auto;
-    height: 3rem;
-    background-color: pink;
+    height: 3.5rem;
+    background-color: $theme-clr-1;
     position: sticky;
     top: 0;
+    box-shadow: 0 5px 10px #000000cc;
+    *:focus {
+        outline: none;
+    }
 }
 
-.navbar__top {
-    width: 100%;
-}
-
-.navbar__language {
-    margin: 0.25rem 0.5rem 0 auto;
-    width: fit-content;
+.denso-logo {
+    img {
+        display: flex;
+        height: 3rem;
+        padding: 0.2rem 0.2rem;
+        margin-left: 0.5rem;
+    }
+    &:focus {
+        img {
+            outline: 1px solid $theme-clr-4;
+            outline-offset: 2px;
+            border-radius: 3px;
+        }
+    }
 }
 
 .navbar__link {
     display: flex;
     justify-content: space-evenly;
+    margin-left: auto;
     a {
-        padding: 0 0.2rem;
+        margin: 0 1.5rem;
+        font-size: 1.4rem;
         font-weight: bold;
+        color: $theme-clr-4;
+        text-shadow: 0px 0px 18px #ffffffbb;
+        &::after {
+            content: "";
+            display: block;
+            height: 3px;
+            width: 0%;
+            margin: 0 auto;
+            background-color: $theme-clr-4;
+            box-shadow: 0 0 12px #ffffffbb;
+            transition: 0.15s ease-out;
+        }
+        &:hover,
+        &:focus {
+            color: $theme-clr-4;
+            &::after {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.navbar__language {
+    margin: 0.2rem 0.5rem auto auto;
+    width: fit-content;
+    display: flex;
+    align-content: center;
+    a {
+        color: $theme-clr-4;
+        &:focus {
+            text-decoration: underline;
+        }
     }
 }
 
@@ -47,7 +91,10 @@ a {
     display: flex;
     flex: 1;
     padding: 2rem 0;
-    border-top: 1px solid #eaeaea;
+    // border-top: 1px solid #ffffff55;
     justify-content: center;
     align-items: center;
+    background-color: $theme-clr-1;
+    box-shadow: 0 -3px 18px #000000cc;
+    color: $theme-clr-4;
 }
