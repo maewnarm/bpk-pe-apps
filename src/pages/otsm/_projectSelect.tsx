@@ -1,17 +1,24 @@
 import React, { FC, useState } from "react"
 import useEffectDidMount from "@/hooks/useEffectDidMount"
+import { useAppDispatch,useAppSelector } from "@/app/hooks";
+import { 
+    setProject,
+    selectedProject,
+    projectSelected,
+} from "@/app/features/otsm/otsmSlice";
 import { SelectorProps } from "./_types";
 
 const ProjectSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => {
-    const [selectedProject, setSelectedProject] = useState("choose one...")
-    const [projectSelected, setProjectSelected] = useState(false)
+    const dispatch = useAppDispatch()
+    const selectedProjectValue = useAppSelector(selectedProject)
+    const projectSelectedvalue = useAppSelector(projectSelected)
 
     useEffectDidMount(() => {
-        if (projectSelected) {
+        if (projectSelectedvalue) {
             document.querySelector('.otsm__project.help')?.classList.replace('is-danger', 'is-hide')
             document.querySelector('.otsm__project.otsm__dropdown__button')?.classList.replace('is-danger', 'is-primary')
         }
-    }, [projectSelected])
+    }, [projectSelectedvalue])
 
     return (
         <div className="otsm__selector">
@@ -19,7 +26,7 @@ const ProjectSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
             <div className="otsm__project__dropdown dropdown">
                 <div className="otsm__project__dropdown dropdown-trigger"  onClick={toggleDropdown} onBlur={toggleDropdown}>
                     <button className="otsm__project otsm__dropdown__button button is-outlined is-danger" aria-haspopup="true" aria-controls="dropdown-menu">
-                        <span><i>{selectedProject}</i></span>
+                        <span><i>{selectedProjectValue}</i></span>
                         <span className="icon is-small">
                             <i className="fas fa-angle-down" aria-hidden="true"></i>
                         </span>
@@ -29,8 +36,7 @@ const ProjectSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
                     <div className="dropdown-content">
                         <a className="otsm__project otsm__dropdown__item 1 dropdown-item" onClick={(e: React.MouseEvent) => {
                             toggleContent(e, 1)
-                            setSelectedProject(e.currentTarget.innerHTML)
-                            setProjectSelected(true)
+                            dispatch(setProject(e.currentTarget.innerHTML))
                         }}>
                             Test Project1
                         </a>

@@ -4,6 +4,11 @@
     color: $theme-clr-4;
 }
 
+.otsm {
+    width: 90%;
+    margin: 0 auto;
+}
+
 .is-hide {
     visibility: hidden;
 }
@@ -61,5 +66,22 @@
             max-height: 200px;
             padding: 0.5rem 0;
         }
+    }
+}
+
+.otsm__machine-signal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.otsm__machine-signal__button {
+    background-color: inherit !important;
+    display: flex;
+    background-color: white;
+    justify-content: space-evenly;
+    margin-top: 1rem;
+    button {
+        color: white !important;
     }
 }
