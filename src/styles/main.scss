@@ -22,20 +22,15 @@ html {
     }
 }
 
-.main {
-    background-color: $theme-clr-2;
-    min-height: max(400px, calc(100vh - 144px));
-}
-
-.index-page {
-    min-width: max(720px, 90%);
-    margin: 0 auto;
-    min-height: max(400px, 70vh);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
+// .index-page {
+//     min-width: max(720px, 90%);
+//     margin: 0 auto;
+//     min-height: max(400px, 70vh);
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     align-items: center;
+// }
 
 .welcome-message {
     text-align: center;

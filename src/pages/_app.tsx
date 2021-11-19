@@ -6,7 +6,7 @@ import Head from 'next/head';
 import type { AppProps } from 'next/app'
 import { Provider } from 'react-redux';
 import store from '@/app/store';
-import Layout from '@/components/layout'
+import Layout from '@/components/layout/layout'
 import { ToastContainer } from 'react-toastify'
 
 

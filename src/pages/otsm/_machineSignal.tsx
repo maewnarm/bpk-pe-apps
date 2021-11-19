@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback } from "react"
+import { useState, FC, CSSProperties, useRef } from "react"
 import useEffectDidMount from "@/hooks/useEffectDidMount"
+import Timer from "@/components/timer/timer"
 import { useAppSelector } from "@/app/hooks"
 import {
     selectedProject,
@@ -7,80 +8,188 @@ import {
     selectedMachine,
     machineSelected,
 } from '@/app/features/otsm/otsmSlice'
+import { MqttConnectionProps } from "./_types"
 import Paho from 'paho-mqtt'
-import mqtt from 'mqtt'
 import { useEffect } from "react"
 
-// global.WebSocket = require('websocket')
-var mqttConnected = false
+const host = "192.168.152.128"
+// const host = "broker.emqx.io"
 
-const MqttConnection = () => {
+const buttonSignals = [
+    "Home position",
+    "Auto condition",
+    "Auto run",
+    "Cycle stop",
+    "Fault stop",
+    "Emergency stop",
+]
+var initialSignalsValue: { [key: string]: number } = buttonSignals.reduce(
+    (prevVal, curVal) => ({ ...prevVal, [curVal]: 0 }), {}
+)
+
+const MqttConnection: FC<MqttConnectionProps> = ({ setIsConnected, signalStatus, setSignalStatus, sendSignalStatus, projectSelected, machineSelected }) => {
     const selectedProjectValue = useAppSelector(selectedProject)
     const selectedMachineValue = useAppSelector(selectedMachine)
-    const [connectionState, setConnectionState] = useState("Not connected")
-    const [subscribesStatus, setSubscribesStatus] = useState({})
-    var client: Paho.Client
+    const [mqttClient, setMqttClient] = useState<Paho.Client>()
+    const [connectionState, setConnectionState] = useState("Not connect")
+    const [subscribedLists, setSubscribedLists] = useState<string[]>([])
+    const onMessageArrived = useRef<(message: Paho.Message) => void>()
 
-    // const host = "mqtt://192.168.152.128"
-    const host = "broker.emqx.io"
+    const ConnectionButton = () => {
+        if (mqttClient && mqttClient.isConnected()) {
+            return (
+                <button className="button" onClick={() => disconnectMQTT()} style={{ color: "#ff5f5f" }}>
+                    <i className="fas fa-power-off" style={{ color: "#ff5f5f", marginRight: "0.2rem" }} />
+                    Disconnect
+                </button>
+            )
+        } else {
+            return (
+                <button className="button" onClick={() => setMQTT()} style={{ color: "#80ff00" }} disabled={!(projectSelected && machineSelected)}>
+                    <i className="fas fa-power-off" style={{ color: "#80ff00", marginRight: "0.2rem" }} />
+                    Connect
+                </button>
+            )
+        }
+    }
+
+    const setMQTT = () => {
+        setMqttClient(new Paho.Client(host, 8083, "asd"))
+    }
 
     function onConnect() {
         setConnectionState("Connected")
+        setIsConnected(true)
+        document.getElementById('connectionState')?.classList.toggle("is-connected", true)
         console.log("connected")
+        const subTopic = `otsm/${selectedProjectValue}/${selectedMachineValue}/#`
+        subscribe(subTopic)
     }
 
-    const connectMQTT = useCallback(() => {
-        client = new Paho.Client(host, 8083, "asd")
-        client.connect({
-            onSuccess: onConnect,
-            // useSSL: true,
-        })
-    }, [])
+    function onFailure() {
+        setConnectionState("Connection failed")
+    }
+
+    function onConnectionLost(response: Paho.MQTTError) {
+        setConnectionState("Disconnected")
+        setIsConnected(false)
+        setSignalStatus(initialSignalsValue)
+        setSubscribedLists([])
+        document.getElementById('connectionState')?.classList.toggle("is-connected", false)
+        console.log("Connection lost: " + response.errorMessage)
+    }
 
     useEffect(() => {
-        connectMQTT()
-        return () => {
-            console.log("out")
-            client.disconnect()
+        onMessageArrived.current = function (message: Paho.Message) {
+            console.log("Message arrived: " + message.payloadString + " from Topic: " + message.destinationName)
+            const topic = message.destinationName.split("/")
+            if (topic) {
+                let topicValue = parseInt(message.payloadString)
+                let topicProject = topic[1]
+                let topicMachine = topic[2]
+                let topicSignal = topic[3]
+                // console.log(signalStatus)
+                setSignalStatus({ ...signalStatus, [topicSignal]: topicValue })
+            }
         }
-    }, [connectMQTT])
+    }, [signalStatus])
 
-    // const connectMQTT = () => {
-    //     client = new Paho.Client(host, 8083, "asd")
-    //     client.connect({
-    //         onSuccess: onConnect,
-    //         // useSSL: true,
-    //     })
-    // }
+    const connectMQTT = () => {
+        // console.log(mqttClient?.isConnected())
+        if (mqttClient && !mqttClient.isConnected()) {
+            setConnectionState("Connecting ...")
+            mqttClient.connect({
+                onSuccess: onConnect,
+                // useSSL: true,
+                onFailure: onFailure,
+            })
+            mqttClient.onConnectionLost = (response) => onConnectionLost(response)
+            mqttClient.onMessageArrived = (message) => {
+                if (onMessageArrived.current) {
+                    onMessageArrived.current(message)
+                }
+            }
+        }
+    }
 
-    const publish = async (pubTopic: string) => {
-        // const pubTopic = document.getElementById('topic_pub').value
-        const elementID = `msg-${pubTopic}`
-        const message = new Paho.Message("")
-        message.destinationName = pubTopic
-        message.qos = 0
-        message.retained = false
-        client.send(message)
-        console.log("publish: " + pubTopic + ", msg: " + message)
+    useEffect(() => {
+        if (mqttClient && !mqttClient.isConnected()) {
+            connectMQTT()
+        }
+        return () => {
+            if (mqttClient && mqttClient.isConnected()) {
+                console.log("out")
+                mqttClient.disconnect()
+            }
+        }
+    }, [mqttClient])
+
+    useEffectDidMount(() => {
+        // disconnectMQTT()
+        //unsubscribe all
+        subscribedLists.forEach(list => {
+            unsubscribe(list)
+        })
+        //subscribe new
+        subscribe(`otsm/${selectedProjectValue}/${selectedMachineValue}/#`)
+    }, [selectedProjectValue, selectedMachineValue])
+
+    const disconnectMQTT = () => {
+        if (mqttClient && mqttClient.isConnected()) {
+            setConnectionState("Disconnecting ...")
+            mqttClient.disconnect()
+        }
     }
 
     const subscribe = (subTopic: string) => {
-        // const subTopic = document.getElementById('topic_sub').value
-        client.subscribe(subTopic)
-        setSubscribesStatus({ ...subscribesStatus, [subTopic]: true })
-        console.log("subscribe: " + subTopic)
+        if (mqttClient && mqttClient.isConnected()) {
+            // const subTopic = document.getElementById('topic_sub').value
+            mqttClient.subscribe(subTopic)
+            var newSubscribeLists = subscribedLists
+            if (!newSubscribeLists.includes(subTopic)) {
+                newSubscribeLists = [...subscribedLists, subTopic]
+            }
+            setSubscribedLists(newSubscribeLists)
+            console.log("subscribe: " + subTopic)
+        }
+    }
+
+    useEffectDidMount(() => {
+        const sendSignalType = Object.keys(sendSignalStatus)[0]
+        const sendSignalValue = Object.values(sendSignalStatus)[0]
+        publish(sendSignalType, sendSignalValue)
+    }, [sendSignalStatus])
+
+    const publish = async (signalType: string, value: number) => {
+        if (mqttClient && mqttClient.isConnected()) {
+            const pubTopic = `otsm/${selectedProjectValue}/${selectedMachineValue}/${signalType}`
+            const message = new Paho.Message(value.toString())
+            message.destinationName = pubTopic
+            message.qos = 0
+            message.retained = true
+            mqttClient.send(message)
+            console.log("publish: " + pubTopic + ", msg: " + message)
+        }
     }
 
     const unsubscribe = (subTopic: string) => {
-        client.unsubscribe(subTopic)
-        setSubscribesStatus({ ...subscribesStatus, [subTopic]: false })
-        console.log("unsubscribe: " + subTopic)
+        if (mqttClient && mqttClient.isConnected()) {
+            mqttClient.unsubscribe(subTopic)
+            console.log("unsubscribe: " + subTopic)
+        }
     }
 
     return (
-        <div className="otsm__machine-signal__mqtt">
-            <h1>MQTT</h1>
-            <button className="button" onClick={() => connectMQTT()}>Connect</button>
+        <div className="otsm__machine-signal__connection">
+            <div className="otsm__machine-signal__connect">
+                <p>MQTT Connection : </p>
+                <p id="connectionState" className="connection-state">{connectionState}</p>
+                <ConnectionButton />
+            </div>
+            <div className="otsm__machine-signal__subscribe">
+                <p>Subscribed : </p>
+                {subscribedLists.map((list, idx) => <p key={idx} className="subscribed-list"><strong>{list}</strong></p>)}
+            </div>
         </div>
     )
 }
@@ -88,48 +197,49 @@ const MqttConnection = () => {
 const MachineSignal = () => {
     const projectSelectedValue = useAppSelector(projectSelected)
     const machineSelectedValue = useAppSelector(machineSelected)
-
-    const buttonSignals = [
-        "Home position",
-        "Auto condition",
-        "Auto run",
-        "Cycle stop",
-        "Fault stop",
-        "Emergency stop",
-    ]
-    var signalsValue: { [key: string]: number } = buttonSignals.reduce(
-        (prevVal, curVal) => ({ ...prevVal, [curVal]: 0 }), {}
-    )
+    const [isConnected, setIsConnected] = useState(false)
+    const [signalStatus, setSignalStatus] = useState(initialSignalsValue)
+    const [sendSignalStatus, setSendSignalStatus] = useState(initialSignalsValue)
 
     function toggleSignal(signalKey: string) {
         console.log(signalKey)
+        // setSignalStatus({ ...signalStatus, [signalKey]: 1 })
+        setSendSignalStatus({ [signalKey]: 1 })
     }
 
     return (
         <div className="otsm__machine-signal">
+            <MqttConnection setIsConnected={setIsConnected} signalStatus={signalStatus} setSignalStatus={setSignalStatus} sendSignalStatus={sendSignalStatus} projectSelected={projectSelectedValue} machineSelected={machineSelectedValue} />
             <div className="otsm__machine-signal__button">
-                {Object.keys(signalsValue).map((key, idx) => {
+                {Object.keys(signalStatus).map((key, idx) => {
                     var classSet = "button"
-                    const value = signalsValue[key]
-                    if (key.includes("stop")) {
-                        classSet += " is-danger"
-                    } else {
-                        classSet += " is-info"
-                    }
-
+                    var bgColor = "#3e8ed055"
+                    const value = signalStatus[key]
                     if (value === 0) {
                         classSet += " is-outlined"
                     }
+                    let timer = null
+                    if (key.includes("stop")) {
+                        classSet += " is-danger"
+                        bgColor = "#f1466855"
+                        timer = <Timer startSignal={false}/>
+                    } else {
+                        classSet += " is-info"
+                    }
                     return (
-                        <button key={idx} className={classSet}
-                            onClick={() => toggleSignal(key)}
-                            disabled={!(projectSelectedValue && machineSelectedValue)}>
-                            {key}
-                        </button>
+                        <div className="otsm__machine-signal__button__item">
+                            <button key={idx} className={classSet}
+                                onClick={() => toggleSignal(key)}
+                                disabled={!(projectSelectedValue && machineSelectedValue && isConnected)}
+                                style={{ "--bg-clr": bgColor } as CSSProperties}
+                            >
+                                {key}
+                            </button>
+                            {timer}
+                        </div>
                     )
                 })}
             </div>
-            <MqttConnection />
         </div>
     )
 }

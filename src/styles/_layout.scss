@@ -4,13 +4,16 @@ a {
     color: black;
 }
 
-.main {
-    min-width: max(720px, 90%);
+.main-layout {
+    min-height: max(400px, calc(100vh - 144px));
+    // min-width: max(720px, 90%);
     margin: 0 auto;
-    min-height: max(400px, 70vh);
+    padding-bottom: 4rem;
+    // min-height: max(400px, 70vh);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background-color: $theme-clr-2;
 }
 
 .navbar {
