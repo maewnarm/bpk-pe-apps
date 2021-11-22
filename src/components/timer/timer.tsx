@@ -15,13 +15,21 @@ const Timer: FC<TimerProps> = ({
 }) => {
     const [count, setCount] = useState(0)
     const timer = useRef<NodeJS.Timer>()
-    var time = "00:00"
+    const [time, setTime] = useState("00:00")
+    const timeCountUp = useRef<() => void>()
+
+    function countUp() {
+        timeCountUp.current = function () {
+            console.log(count)
+            setCount(count + 1)
+        }
+    }
 
     useEffect(() => { //start signal
+        console.log("start is changed")
         if (startSignal && !timer.current) {
             timer.current = setInterval(() => {
-                console.log(count)
-                setCount(count + 1)
+                countUp()
             }, 1000)
         }
     }, [startSignal])
@@ -33,9 +41,10 @@ const Timer: FC<TimerProps> = ({
     }, [stopSignal])
 
     useEffect(() => {
-        const currentTimer = moment(count)
-        time = `${currentTimer.hour().toLocaleString('en-US', { minimumIntegerDigits: 2 })} \
-        :${currentTimer.minute().toLocaleString('en-US', { minimumIntegerDigits: 2 })}`
+        const currentTimer = moment(count * 1000)
+        let timeValue = `${currentTimer.hour().toLocaleString('en-US', { minimumIntegerDigits: 2 })}` +
+            `:${currentTimer.minute().toLocaleString('en-US', { minimumIntegerDigits: 2 })}`
+        setTime(timeValue)
     }, [count])
 
     return (

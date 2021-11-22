@@ -12,7 +12,8 @@ import { MqttConnectionProps } from "./_types"
 import Paho from 'paho-mqtt'
 import { useEffect } from "react"
 
-const host = "192.168.152.128"
+// const host = "192.168.152.128"
+const host = "127.0.0.1"
 // const host = "broker.emqx.io"
 
 const buttonSignals = [
@@ -222,7 +223,7 @@ const MachineSignal = () => {
                     if (key.includes("stop")) {
                         classSet += " is-danger"
                         bgColor = "#f1466855"
-                        timer = <Timer startSignal={false}/>
+                        timer = <Timer startSignal={value === 1 ? false : true}/>
                     } else {
                         classSet += " is-info"
                     }
