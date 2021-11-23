@@ -1,7 +1,15 @@
+// components
 @use 'layout';
+@use "timer";
+
+// pages
 @use 'otsm';
-@import 'bulma/css/bulma.css';
+
+// commons
 @import "variables";
+
+// libraries
+@import 'bulma/css/bulma.css';
 
 html {
     overflow-y: auto;

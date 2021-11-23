@@ -1,6 +1,6 @@
-import { DependencyList, EffectCallback, useEffect,useRef } from "react";
+import { DependencyList, EffectCallback, useEffect, useRef } from "react";
 
-const useEffectDidMount = (func: EffectCallback,deps:DependencyList) => {
+const useEffectDidMount = (func: EffectCallback, deps: DependencyList) => {
     const isMounted = useRef(false)
     useEffect(() => {
         if (isMounted.current) {
@@ -8,7 +8,7 @@ const useEffectDidMount = (func: EffectCallback,deps:DependencyList) => {
         } else {
             isMounted.current = true
         }
-    },deps)
+    }, deps)
 }
 
 export default useEffectDidMount

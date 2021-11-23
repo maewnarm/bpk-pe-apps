@@ -10,6 +10,7 @@ export interface MqttConnectionProps {
     signalStatus: { [key: string]: number }
     setSignalStatus: Dispatch<SetStateAction<{ [key: string]: number }>>
     sendSignalStatus: { [key: string]: number }
+    setSendSignalStatus: Dispatch<SetStateAction<{ [key: string]: number }>>
     projectSelected: boolean
     machineSelected: boolean
 }

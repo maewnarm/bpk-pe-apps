@@ -1,7 +1,16 @@
 import { FC, useEffect, useRef, useState } from "react"
-import { TimerProps } from "./_types"
-import useEffectDidMount from "@/hooks/useEffectDidMount"
 import moment from "moment"
+
+export interface TimerProps {
+    startSignal?: boolean
+    pauseSignal?: boolean
+    stopSignal?: boolean
+    resetSignal?: boolean
+    startFunction?: () => void
+    pauseFunction?: () => void
+    stopFunction?: () => void
+    resetFunction?: () => void
+}
 
 const Timer: FC<TimerProps> = ({
     startSignal,
@@ -14,42 +23,57 @@ const Timer: FC<TimerProps> = ({
     resetFunction
 }) => {
     const [count, setCount] = useState(0)
-    const timer = useRef<NodeJS.Timer>()
     const [time, setTime] = useState("00:00")
-    const timeCountUp = useRef<() => void>()
+    const [timer, setTimer] = useState<NodeJS.Timer>()
+    const timerCounter = useRef<() => void>()
 
-    function countUp() {
-        timeCountUp.current = function () {
-            console.log(count)
-            setCount(count + 1)
-        }
+    const timerCountUp = () => {
+        setCount(count + 1)
     }
+
+    useEffect(() => {
+        timerCounter.current = timerCountUp
+    }, [timerCountUp])
 
     useEffect(() => { //start signal
         console.log("start is changed")
-        if (startSignal && !timer.current) {
-            timer.current = setInterval(() => {
-                countUp()
+        console.log(startSignal)
+        if (startSignal) {
+            setCount(0)
+            let interval = setInterval(() => {
+                if (timerCounter.current) {
+                    timerCounter.current()
+                }
             }, 1000)
+            setTimer(interval)
+        } else if (timer && !startSignal && stopSignal === undefined) {
+            clearInterval(timer)
         }
+
+        return (() => {
+            if (timer) {
+                clearInterval(timer)
+            }
+        })
     }, [startSignal])
 
     useEffect(() => { //stop signal
-        if (stopSignal && timer.current) {
-            clearInterval(timer.current)
+        console.log(stopSignal)
+        if (timer && stopSignal) {
+            clearInterval(timer)
         }
     }, [stopSignal])
 
     useEffect(() => {
         const currentTimer = moment(count * 1000)
-        let timeValue = `${currentTimer.hour().toLocaleString('en-US', { minimumIntegerDigits: 2 })}` +
-            `:${currentTimer.minute().toLocaleString('en-US', { minimumIntegerDigits: 2 })}`
+        let timeValue = `${currentTimer.minute().toLocaleString('en-US', { minimumIntegerDigits: 2 })}` +
+            `:${currentTimer.second().toLocaleString('en-US', { minimumIntegerDigits: 2 })}`
         setTime(timeValue)
     }, [count])
 
     return (
         <div className="timer">
-            <p>{`Timer : ${time} (${count})`}</p>
+            <p>Timer : <strong>{time}</strong></p>
         </div>
     )
 }

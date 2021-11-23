@@ -28,7 +28,7 @@ var initialSignalsValue: { [key: string]: number } = buttonSignals.reduce(
     (prevVal, curVal) => ({ ...prevVal, [curVal]: 0 }), {}
 )
 
-const MqttConnection: FC<MqttConnectionProps> = ({ setIsConnected, signalStatus, setSignalStatus, sendSignalStatus, projectSelected, machineSelected }) => {
+const MqttConnection: FC<MqttConnectionProps> = (props) => {
     const selectedProjectValue = useAppSelector(selectedProject)
     const selectedMachineValue = useAppSelector(selectedMachine)
     const [mqttClient, setMqttClient] = useState<Paho.Client>()
@@ -46,7 +46,7 @@ const MqttConnection: FC<MqttConnectionProps> = ({ setIsConnected, signalStatus,
             )
         } else {
             return (
-                <button className="button" onClick={() => setMQTT()} style={{ color: "#80ff00" }} disabled={!(projectSelected && machineSelected)}>
+                <button className="button" onClick={() => setMQTT()} style={{ color: "#80ff00" }} disabled={!(props.projectSelected && machineSelected)}>
                     <i className="fas fa-power-off" style={{ color: "#80ff00", marginRight: "0.2rem" }} />
                     Connect
                 </button>
@@ -60,7 +60,7 @@ const MqttConnection: FC<MqttConnectionProps> = ({ setIsConnected, signalStatus,
 
     function onConnect() {
         setConnectionState("Connected")
-        setIsConnected(true)
+        props.setIsConnected(true)
         document.getElementById('connectionState')?.classList.toggle("is-connected", true)
         console.log("connected")
         const subTopic = `otsm/${selectedProjectValue}/${selectedMachineValue}/#`
@@ -73,8 +73,8 @@ const MqttConnection: FC<MqttConnectionProps> = ({ setIsConnected, signalStatus,
 
     function onConnectionLost(response: Paho.MQTTError) {
         setConnectionState("Disconnected")
-        setIsConnected(false)
-        setSignalStatus(initialSignalsValue)
+        props.setIsConnected(false)
+        props.setSignalStatus(initialSignalsValue)
         setSubscribedLists([])
         document.getElementById('connectionState')?.classList.toggle("is-connected", false)
         console.log("Connection lost: " + response.errorMessage)
@@ -90,10 +90,10 @@ const MqttConnection: FC<MqttConnectionProps> = ({ setIsConnected, signalStatus,
                 let topicMachine = topic[2]
                 let topicSignal = topic[3]
                 // console.log(signalStatus)
-                setSignalStatus({ ...signalStatus, [topicSignal]: topicValue })
+                props.setSignalStatus({ ...props.signalStatus, [topicSignal]: topicValue })
             }
         }
-    }, [signalStatus])
+    }, [props.signalStatus])
 
     const connectMQTT = () => {
         // console.log(mqttClient?.isConnected())
@@ -156,10 +156,10 @@ const MqttConnection: FC<MqttConnectionProps> = ({ setIsConnected, signalStatus,
     }
 
     useEffectDidMount(() => {
-        const sendSignalType = Object.keys(sendSignalStatus)[0]
-        const sendSignalValue = Object.values(sendSignalStatus)[0]
+        const sendSignalType = Object.keys(props.sendSignalStatus)[0]
+        const sendSignalValue = Object.values(props.sendSignalStatus)[0]
         publish(sendSignalType, sendSignalValue)
-    }, [sendSignalStatus])
+    }, [props.sendSignalStatus])
 
     const publish = async (signalType: string, value: number) => {
         if (mqttClient && mqttClient.isConnected()) {
@@ -202,20 +202,32 @@ const MachineSignal = () => {
     const [signalStatus, setSignalStatus] = useState(initialSignalsValue)
     const [sendSignalStatus, setSendSignalStatus] = useState(initialSignalsValue)
 
-    function toggleSignal(signalKey: string) {
+    function toggleSignal(signalKey: string, currentValue: number) {
         console.log(signalKey)
-        // setSignalStatus({ ...signalStatus, [signalKey]: 1 })
-        setSendSignalStatus({ [signalKey]: 1 })
+        if (currentValue === 0) {
+            setSendSignalStatus({ [signalKey]: 1 })
+        } else {
+            setSendSignalStatus({ [signalKey]: 0 })
+        }
     }
 
     return (
         <div className="otsm__machine-signal">
-            <MqttConnection setIsConnected={setIsConnected} signalStatus={signalStatus} setSignalStatus={setSignalStatus} sendSignalStatus={sendSignalStatus} projectSelected={projectSelectedValue} machineSelected={machineSelectedValue} />
+            <MqttConnection
+                setIsConnected={setIsConnected}
+                signalStatus={signalStatus}
+                setSignalStatus={setSignalStatus}
+                sendSignalStatus={sendSignalStatus}
+                setSendSignalStatus={setSendSignalStatus}
+                projectSelected={projectSelectedValue}
+                machineSelected={machineSelectedValue}
+            />
             <div className="otsm__machine-signal__button">
-                {Object.keys(signalStatus).map((key, idx) => {
+                {buttonSignals.map((key, idx) => {
                     var classSet = "button"
                     var bgColor = "#3e8ed055"
                     const value = signalStatus[key]
+                    console.log(value+key)
                     if (value === 0) {
                         classSet += " is-outlined"
                     }
@@ -223,14 +235,17 @@ const MachineSignal = () => {
                     if (key.includes("stop")) {
                         classSet += " is-danger"
                         bgColor = "#f1466855"
-                        timer = <Timer startSignal={value === 1 ? false : true}/>
+                        timer = <Timer
+                            startSignal={value === 1 ? true : false}
+                            stopSignal={signalStatus["Ready"] === 1 ? true : false}
+                        />
                     } else {
                         classSet += " is-info"
                     }
                     return (
-                        <div className="otsm__machine-signal__button__item">
-                            <button key={idx} className={classSet}
-                                onClick={() => toggleSignal(key)}
+                        <div key={idx} className="otsm__machine-signal__button__item">
+                            <button className={classSet}
+                                onClick={() => toggleSignal(key, value)}
                                 disabled={!(projectSelectedValue && machineSelectedValue && isConnected)}
                                 style={{ "--bg-clr": bgColor } as CSSProperties}
                             >
