@@ -1,6 +1,9 @@
 @import "variables";
 
 .timer {
+    abbr {
+        text-decoration: none;
+    }
     strong {
         color: $theme-clr-3;
     }

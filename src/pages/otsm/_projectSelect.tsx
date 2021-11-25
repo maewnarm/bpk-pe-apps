@@ -1,10 +1,11 @@
 import React, { FC, useState } from "react"
 import useEffectDidMount from "@/hooks/useEffectDidMount"
-import { useAppDispatch,useAppSelector } from "@/app/hooks";
-import { 
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import {
     setProject,
     selectedProject,
     projectSelected,
+    projectSelectDisabled
 } from "@/app/features/otsm/otsmSlice";
 import { SelectorProps } from "./_types";
 
@@ -12,6 +13,7 @@ const ProjectSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
     const dispatch = useAppDispatch()
     const selectedProjectValue = useAppSelector(selectedProject)
     const projectSelectedvalue = useAppSelector(projectSelected)
+    const projectSelectDisabledValue = useAppSelector(projectSelectDisabled)
 
     useEffectDidMount(() => {
         if (projectSelectedvalue) {
@@ -24,8 +26,8 @@ const ProjectSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
         <div className="otsm__selector">
             <label className="label">Project group :</label>
             <div className="otsm__project__dropdown dropdown">
-                <div className="otsm__project__dropdown dropdown-trigger"  onClick={toggleDropdown} onBlur={toggleDropdown}>
-                    <button className="otsm__project otsm__dropdown__button button is-outlined is-danger" aria-haspopup="true" aria-controls="dropdown-menu">
+                <div className="otsm__project__dropdown dropdown-trigger" onClick={(e) => toggleDropdown(e, projectSelectDisabledValue)} onBlur={(e) => toggleDropdown(e, projectSelectDisabledValue)}>
+                    <button className="otsm__project otsm__dropdown__button button is-outlined is-danger" aria-haspopup="true" aria-controls="dropdown-menu" disabled={projectSelectDisabledValue}>
                         <span><i>{selectedProjectValue}</i></span>
                         <span className="icon is-small">
                             <i className="fas fa-angle-down" aria-hidden="true"></i>
@@ -38,7 +40,7 @@ const ProjectSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
                             toggleContent(e, 1)
                             dispatch(setProject(e.currentTarget.innerHTML))
                         }}>
-                            Test Project1
+                            Slip ring [Add-on]
                         </a>
                     </div>
                 </div>

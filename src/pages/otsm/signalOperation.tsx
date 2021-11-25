@@ -1,12 +1,16 @@
 import { useState, FC, CSSProperties, useRef } from "react"
 import useEffectDidMount from "@/hooks/useEffectDidMount"
 import Timer from "@/components/timer/timer"
-import { useAppSelector } from "@/app/hooks"
+import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import {
     selectedProject,
     projectSelected,
+    projectSelectDisabled,
+    setProjectDisable,
     selectedMachine,
     machineSelected,
+    machineSelectDisabled,
+    setMachineDisable
 } from '@/app/features/otsm/otsmSlice'
 import { MqttConnectionProps } from "./_types"
 import Paho from 'paho-mqtt'
@@ -27,6 +31,7 @@ const buttonSignals = [
 var initialSignalsValue: { [key: string]: number } = buttonSignals.reduce(
     (prevVal, curVal) => ({ ...prevVal, [curVal]: 0 }), {}
 )
+var subscribedListsArray: string[] = []
 
 const MqttConnection: FC<MqttConnectionProps> = (props) => {
     const selectedProjectValue = useAppSelector(selectedProject)
@@ -63,8 +68,8 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
         props.setIsConnected(true)
         document.getElementById('connectionState')?.classList.toggle("is-connected", true)
         console.log("connected")
-        const subTopic = `otsm/${selectedProjectValue}/${selectedMachineValue}/#`
-        subscribe(subTopic)
+        subscribe(`otsm/${selectedProjectValue}/${selectedMachineValue}/#`)
+        subscribe(`otsm/${selectedProjectValue}/Ready`)
     }
 
     function onFailure() {
@@ -85,12 +90,17 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
             console.log("Message arrived: " + message.payloadString + " from Topic: " + message.destinationName)
             const topic = message.destinationName.split("/")
             if (topic) {
-                let topicValue = parseInt(message.payloadString)
-                let topicProject = topic[1]
-                let topicMachine = topic[2]
-                let topicSignal = topic[3]
-                // console.log(signalStatus)
-                props.setSignalStatus({ ...props.signalStatus, [topicSignal]: topicValue })
+                if (topic.includes("Ready")) {
+                    let topicValue = parseInt(message.payloadString)
+                    props.setSignalReadyStatus(topicValue)
+                } else {
+                    let topicValue = parseInt(message.payloadString)
+                    // let topicProject = topic[1]
+                    // let topicMachine = topic[2]
+                    let topicSignal = topic[3]
+                    // console.log(signalStatus)
+                    props.setSignalStatus({ ...props.signalStatus, [topicSignal]: topicValue })
+                }
             }
         }
     }, [props.signalStatus])
@@ -126,13 +136,15 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
     }, [mqttClient])
 
     useEffectDidMount(() => {
-        // disconnectMQTT()
+        //reset signalStatus
+        props.setSignalStatus(initialSignalsValue)
         //unsubscribe all
-        subscribedLists.forEach(list => {
+        subscribedListsArray.forEach(list => {
             unsubscribe(list)
         })
         //subscribe new
         subscribe(`otsm/${selectedProjectValue}/${selectedMachineValue}/#`)
+        subscribe(`otsm/${selectedProjectValue}/Ready`)
     }, [selectedProjectValue, selectedMachineValue])
 
     const disconnectMQTT = () => {
@@ -142,18 +154,42 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
         }
     }
 
+    function addSubscribeTopic(subTopic: string) {
+        let newSubscribeLists = subscribedListsArray
+        if (!newSubscribeLists.includes(subTopic)) {
+            newSubscribeLists = [...subscribedListsArray, subTopic]
+        }
+        subscribedListsArray = newSubscribeLists
+        setSubscribedLists(newSubscribeLists)
+    }
+
+    function removeSubscribeTopic(subTopic: string) {
+        let newSubscribeLists = subscribedListsArray.filter(list => list !== subTopic)
+        subscribedListsArray = newSubscribeLists
+        setSubscribedLists(newSubscribeLists)
+    }
+
     const subscribe = (subTopic: string) => {
         if (mqttClient && mqttClient.isConnected()) {
-            // const subTopic = document.getElementById('topic_sub').value
             mqttClient.subscribe(subTopic)
-            var newSubscribeLists = subscribedLists
-            if (!newSubscribeLists.includes(subTopic)) {
-                newSubscribeLists = [...subscribedLists, subTopic]
-            }
-            setSubscribedLists(newSubscribeLists)
+            addSubscribeTopic(subTopic)
             console.log("subscribe: " + subTopic)
         }
     }
+
+    const unsubscribe = (subTopic: string) => {
+        if (mqttClient && mqttClient.isConnected()) {
+            mqttClient.unsubscribe(subTopic)
+            removeSubscribeTopic(subTopic)
+            console.log("unsubscribe: " + subTopic)
+        }
+    }
+
+    useEffect(() => {
+        console.log(subscribedListsArray)
+        console.log(subscribedLists)
+        subscribedListsArray = subscribedLists
+    }, [subscribedLists])
 
     useEffectDidMount(() => {
         const sendSignalType = Object.keys(props.sendSignalStatus)[0]
@@ -161,22 +197,23 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
         publish(sendSignalType, sendSignalValue)
     }, [props.sendSignalStatus])
 
-    const publish = async (signalType: string, value: number) => {
+
+    useEffectDidMount(() => {
+        publish("", props.signalReadyStatus, true)
+    }, [props.signalReadyStatus])
+
+    const publish = async (signalType: string, value: number, isReady?: boolean) => {
+        let pubTopic = `otsm/${selectedProjectValue}/${selectedMachineValue}/${signalType}`
+        if (isReady) {
+            pubTopic = `otsm/${selectedProjectValue}/Ready`
+        }
         if (mqttClient && mqttClient.isConnected()) {
-            const pubTopic = `otsm/${selectedProjectValue}/${selectedMachineValue}/${signalType}`
             const message = new Paho.Message(value.toString())
             message.destinationName = pubTopic
             message.qos = 0
             message.retained = true
             mqttClient.send(message)
             console.log("publish: " + pubTopic + ", msg: " + message)
-        }
-    }
-
-    const unsubscribe = (subTopic: string) => {
-        if (mqttClient && mqttClient.isConnected()) {
-            mqttClient.unsubscribe(subTopic)
-            console.log("unsubscribe: " + subTopic)
         }
     }
 
@@ -189,7 +226,11 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
             </div>
             <div className="otsm__machine-signal__subscribe">
                 <p>Subscribed : </p>
-                {subscribedLists.map((list, idx) => <p key={idx} className="subscribed-list"><strong>{list}</strong></p>)}
+                <ul>
+                    {subscribedLists.map((list, idx) =>
+                        <li key={idx} className="subscribed-list"><strong>{list}</strong></li>
+                    )}
+                </ul>
             </div>
         </div>
     )
@@ -198,18 +239,52 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
 const MachineSignal = () => {
     const projectSelectedValue = useAppSelector(projectSelected)
     const machineSelectedValue = useAppSelector(machineSelected)
+    const projectSelectDisabledValue = useAppSelector(projectSelectDisabled)
+    const machineSelectDisabledValue = useAppSelector(machineSelectDisabled)
+    const dispatch = useAppDispatch()
     const [isConnected, setIsConnected] = useState(false)
     const [signalStatus, setSignalStatus] = useState(initialSignalsValue)
     const [sendSignalStatus, setSendSignalStatus] = useState(initialSignalsValue)
+    const [signalReadyStatus, setSignalReadyStatus] = useState(0)
+    const [timerIsRunning, setTimerIsRunning] = useState(false)
 
-    function toggleSignal(signalKey: string, currentValue: number) {
-        console.log(signalKey)
+    function toggleSignal(signalKey: string, currentValue: number, effectToReady: boolean) {
+        // console.log(signalKey)
         if (currentValue === 0) {
             setSendSignalStatus({ [signalKey]: 1 })
+            if (effectToReady) {
+                setSignalReadyStatus(0)
+            }
         } else {
             setSendSignalStatus({ [signalKey]: 0 })
         }
     }
+
+    function toggleReadySignal(currentValue: number) {
+        if (currentValue === 0) {
+            setSignalReadyStatus(1)
+        } else {
+            setSignalReadyStatus(0)
+        }
+    }
+
+    useEffect(() => {
+        console.log("signalStatus changed")
+        console.log(timerIsRunning)
+        let haveTimerStopOn = false
+        Object.keys(signalStatus).forEach(signal => {
+            if (signal.includes("stop") && signalStatus[signal] === 1) {
+                haveTimerStopOn = true
+            }
+        })
+        if (timerIsRunning) {
+            haveTimerStopOn = true
+        } else if (!timerIsRunning && !haveTimerStopOn) {
+            haveTimerStopOn = false
+        }
+        dispatch(setProjectDisable(haveTimerStopOn))
+        dispatch(setMachineDisable(haveTimerStopOn))
+    }, [signalStatus, timerIsRunning])
 
     return (
         <div className="otsm__machine-signal">
@@ -219,25 +294,38 @@ const MachineSignal = () => {
                 setSignalStatus={setSignalStatus}
                 sendSignalStatus={sendSignalStatus}
                 setSendSignalStatus={setSendSignalStatus}
+                signalReadyStatus={signalReadyStatus}
+                setSignalReadyStatus={setSignalReadyStatus}
                 projectSelected={projectSelectedValue}
                 machineSelected={machineSelectedValue}
             />
+            <div className="otsm__machine-signal__button__ready">
+                <button className={`button is-success ${signalReadyStatus === 1 ? "" : "is-outlined"}`}
+                    onClick={() => toggleReadySignal(signalReadyStatus)}
+                    disabled={!(projectSelectedValue && machineSelectedValue && isConnected)}
+                >
+                    Ready
+                </button>
+            </div>
             <div className="otsm__machine-signal__button">
                 {buttonSignals.map((key, idx) => {
-                    var classSet = "button"
-                    var bgColor = "#3e8ed055"
+                    let classSet = "button"
+                    let bgColor = "#3e8ed055"
                     const value = signalStatus[key]
-                    console.log(value+key)
+                    let effectToReady = false
+                    let timer = null
                     if (value === 0) {
                         classSet += " is-outlined"
                     }
-                    let timer = null
                     if (key.includes("stop")) {
                         classSet += " is-danger"
                         bgColor = "#f1466855"
+                        effectToReady = true
                         timer = <Timer
                             startSignal={value === 1 ? true : false}
-                            stopSignal={signalStatus["Ready"] === 1 ? true : false}
+                            stopSignal={signalReadyStatus === 1 ? true : false}
+                            abbrMessage="Timer will stop by 'Ready' signal is ON"
+                            returnTimerRunningFlagFunction={setTimerIsRunning}
                         />
                     } else {
                         classSet += " is-info"
@@ -245,7 +333,7 @@ const MachineSignal = () => {
                     return (
                         <div key={idx} className="otsm__machine-signal__button__item">
                             <button className={classSet}
-                                onClick={() => toggleSignal(key, value)}
+                                onClick={() => toggleSignal(key, value, effectToReady)}
                                 disabled={!(projectSelectedValue && machineSelectedValue && isConnected)}
                                 style={{ "--bg-clr": bgColor } as CSSProperties}
                             >

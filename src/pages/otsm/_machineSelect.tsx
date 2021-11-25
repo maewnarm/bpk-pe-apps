@@ -5,7 +5,8 @@ import {
     setMachine,
     selectedProject,
     selectedMachine,
-    machineSelected
+    machineSelected,
+    machineSelectDisabled
 } from '@/app/features/otsm/otsmSlice'
 import { SelectorProps } from "./_types";
 
@@ -14,6 +15,7 @@ const MachineSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
     const selectedProjectValue = useAppSelector(selectedProject)
     const selectedMachineValue = useAppSelector(selectedMachine)
     const machineSelectedvalue = useAppSelector(machineSelected)
+    const machineSelectDisabledValue = useAppSelector(machineSelectDisabled)
 
     useEffectDidMount(() => {
         if (machineSelectedvalue) {
@@ -24,7 +26,7 @@ const MachineSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
 
     useEffect(() => {
         resetSelection()
-    },[selectedProjectValue])
+    }, [selectedProjectValue])
 
     function resetSelection() {
         document.querySelector('.otsm__machine.help')?.classList.replace('is-hide', 'is-danger')
@@ -38,8 +40,8 @@ const MachineSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
         <div className="otsm__selector">
             <label className="label">Machine :</label>
             <div className="otsm__machine__dropdown dropdown">
-                <div className="otsm__machine__dropdown dropdown-trigger" onClick={toggleDropdown} onBlur={toggleDropdown}>
-                    <button className="otsm__machine otsm__dropdown__button button is-outlined is-danger" aria-haspopup="true" aria-controls="dropdown-menu">
+                <div className="otsm__machine__dropdown dropdown-trigger" onClick={(e) => toggleDropdown(e, machineSelectDisabledValue)} onBlur={(e) => toggleDropdown(e, machineSelectDisabledValue)}>
+                    <button className="otsm__machine otsm__dropdown__button button is-outlined is-danger" aria-haspopup="true" aria-controls="dropdown-menu" disabled={machineSelectDisabledValue}>
                         <span><i>{selectedMachineValue}</i></span>
                         <span className="icon is-small">
                             <i className="fas fa-angle-down" aria-hidden="true"></i>
@@ -52,13 +54,19 @@ const MachineSelect: FC<SelectorProps> = ({ toggleDropdown, toggleContent }) => 
                             toggleContent(e, 1)
                             dispatch(setMachine(e.currentTarget.innerHTML))
                         }}>
-                            Test MC1
+                            Drilling
                         </a>
                         <a className="otsm__machine otsm__dropdown__item 2 dropdown-item" onClick={(e: React.MouseEvent) => {
                             toggleContent(e, 2)
                             dispatch(setMachine(e.currentTarget.innerHTML))
                         }}>
-                            Test MC2
+                            Top lead bending
+                        </a>
+                        <a className="otsm__machine otsm__dropdown__item 2 dropdown-item" onClick={(e: React.MouseEvent) => {
+                            toggleContent(e, 3)
+                            dispatch(setMachine(e.currentTarget.innerHTML))
+                        }}>
+                            Electric check
                         </a>
                     </div>
                 </div>

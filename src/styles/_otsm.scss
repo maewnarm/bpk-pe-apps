@@ -6,11 +6,34 @@
 
 .otsm {
     width: 90%;
-    margin: 0 auto;
+    margin: 2rem auto;
+    .tabs ul {
+        border-bottom-width: 2px;
+        gap: 0.2rem;
+        li {
+            a {
+                border-bottom-width: 2px;
+                margin-bottom: -2px;
+                &:hover {
+                    border-color: darken($theme-clr-3, 25%);
+                }
+            }
+            &.is-active a {
+                border-color: $theme-clr-3;
+                border-bottom-width: 2px;
+                margin-bottom: -2px;
+                font-weight: bold;
+                span,
+                span i {
+                    color: $correct-clr;
+                }
+            }
+        }
+    }
 }
 
 .is-hide {
-    visibility: hidden;
+    display: none;
 }
 
 .otsm__grid-container {
@@ -99,6 +122,34 @@
         button {
             height: fit-content;
             padding: 0.2rem 0.3rem;
+        }
+    }
+    .otsm__machine-signal__subscribe {
+        flex-direction: column;
+        align-items: flex-start;
+        ul li.subscribed-list {
+            margin-left: 0.5rem;
+            list-style: none;
+            &::before {
+                content: "-> ";
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+.otsm__machine-signal__button__ready {
+    display: flex;
+    justify-content: center;
+    width: min(90vw, 600px);
+    margin: 0 auto;
+    button {
+        width: 100%;
+        &:hover,
+        &:focus {
+            &:not([disabled]).is-outlined {
+                background-color: #48c78e55 !important;
+            }
         }
     }
 }

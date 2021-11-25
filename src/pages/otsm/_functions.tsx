@@ -1,13 +1,17 @@
 import React from 'react'
 
-export function toggleDropdownIsActive(e: React.MouseEvent | React.FocusEvent) {
-    const target = e.currentTarget
-    const classIdentify = target.classList.toString().split(" ").shift()
-    if (classIdentify) {
-        if (e.type === "blur") {
-            document.querySelector(`.${classIdentify}.dropdown`)?.classList.toggle("is-active", false)
-        } else {
-            document.querySelector(`.${classIdentify}.dropdown`)?.classList.toggle("is-active")
+export function toggleDropdownIsActive(e: React.MouseEvent | React.FocusEvent, isDisabled?: boolean) {
+    if (isDisabled) {
+        return
+    } else {
+        const target = e.currentTarget
+        const classIdentify = target.classList.toString().split(" ").shift()
+        if (classIdentify) {
+            if (e.type === "blur") {
+                document.querySelector(`.${classIdentify}.dropdown`)?.classList.toggle("is-active", false)
+            } else {
+                document.querySelector(`.${classIdentify}.dropdown`)?.classList.toggle("is-active")
+            }
         }
     }
 }
