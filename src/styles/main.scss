@@ -1,72 +1,61 @@
 // components
-@use 'layout';
+@use "layout";
 @use "timer";
 
 // pages
-@use 'otsm';
+@use "otsm";
 
 // commons
 @import "variables";
 
 // libraries
-@import 'bulma/css/bulma.css';
+@import "bulma/css/bulma.css";
 
 html {
-    overflow-y: auto;
-    &::-webkit-scrollbar {
-        width: 6px;
-        // background-color: rgba($color: #fff, $alpha: 0.2);
-        box-shadow: inset 0 0 3px rgb(94, 94, 94);
-        background-color: $theme-clr-2;
-    }
-    &::-webkit-scrollbar-track {
-        // background-color: rgba(228, 228, 228, 0.4);
-        background-color: $theme-clr-2;
-    }
-    &::-webkit-scrollbar-thumb {
-        // background-color: rgba(25, 103, 204, 0.5);
-        background-color: $theme-clr-1;
-        border-radius: 3px;
-        border: 1px solid darker($theme-clr-1,50%);
-    }
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    width: 6px;
+    // background-color: rgba($color: #fff, $alpha: 0.2);
+    box-shadow: inset 0 0 3px rgb(94, 94, 94);
+    background-color: $theme-clr-2;
+  }
+  &::-webkit-scrollbar-track {
+    // background-color: rgba(228, 228, 228, 0.4);
+    background-color: $theme-clr-2;
+  }
+  &::-webkit-scrollbar-thumb {
+    // background-color: rgba(25, 103, 204, 0.5);
+    background-color: $theme-clr-1;
+    border-radius: 3px;
+    border: 1px solid darker($theme-clr-1, 50%);
+  }
 }
 
-// .index-page {
-//     min-width: max(720px, 90%);
-//     margin: 0 auto;
-//     min-height: max(400px, 70vh);
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: center;
-//     align-items: center;
-// }
-
 .index-page {
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    margin: auto;
-    min-height: 100%;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  margin: auto;
+  min-height: 100%;
 }
 
 .welcome-message {
-    text-align: center;
-    p {
-        color: $theme-clr-4;
-        &:first-child {
-            font-size: max(2.75vw, 2rem);
-            margin-bottom: 0;
-            color: $theme-clr-4;
-        }
-        &:last-child {
-            font-size: max(2vw, 1.5rem);
-            margin: 0;
-        }
+  text-align: center;
+  p {
+    color: $theme-clr-4;
+    &:first-child {
+      font-size: max(2.75vw, 2rem);
+      margin-bottom: 0;
+      color: $theme-clr-4;
     }
-    strong {
-        font-size: max(3.5vw, 3.5rem);
-        color: $theme-clr-4;
-        text-shadow: 0 0 15px #ffffff88;
+    &:last-child {
+      font-size: max(2vw, 1.5rem);
+      margin: 0;
     }
+  }
+  strong {
+    font-size: max(3.5vw, 3.5rem);
+    color: $theme-clr-4;
+    text-shadow: 0 0 15px #ffffff88;
+  }
 }
-
