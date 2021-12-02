@@ -1,14 +1,13 @@
-import '@/styles/globals.css'
-import '@/styles/main.scss'
-import '@fortawesome/fontawesome-free/css/all.css'
-import 'react-toastify/dist/ReactToastify.css';
-import Head from 'next/head';
-import type { AppProps } from 'next/app'
-import { Provider } from 'react-redux';
-import store from '@/app/store';
-import Layout from '@/components/layout/layout'
-import { ToastContainer } from 'react-toastify'
-
+import "@/styles/globals.css";
+import "@/styles/main.scss";
+import "@fortawesome/fontawesome-free/css/all.css";
+import "react-toastify/dist/ReactToastify.css";
+import Head from "next/head";
+import type { AppProps } from "next/app";
+import { Provider } from "react-redux";
+import store from "@/app/store";
+import Layout from "@/components/layout/layout";
+import { ToastContainer } from "react-toastify";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -21,6 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         </Head>
         <Component {...pageProps} />
         <ToastContainer
+          theme="dark"
           position="top-right"
           autoClose={3000}
           hideProgressBar={false}
@@ -33,7 +33,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
       </Layout>
     </Provider>
-  )
+  );
 }
 
-export default MyApp
+export default MyApp;

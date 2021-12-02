@@ -6,7 +6,12 @@ export interface SelectorProps {
     isDisabled?: boolean
   ) => void;
   toggleContent: (e: React.MouseEvent, index: number) => void;
-  contentItems: { name: string; id: number }[];
+  contentItems: {
+    id: number;
+    name: string;
+    product?: string;
+    part?: string;
+  }[];
 }
 
 export interface MqttConnectionProps {
@@ -22,11 +27,10 @@ export interface MqttConnectionProps {
 }
 
 export interface TableProjectProps {
-  projectLists: any[];
-  selectProject: (lists: any[]) => void;
+  selectProject?: (lists: any[]) => void;
+  setShowMachine: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface TableMachineProps {
   setShowMachine: Dispatch<SetStateAction<boolean>>;
-  machineLists: any[];
 }

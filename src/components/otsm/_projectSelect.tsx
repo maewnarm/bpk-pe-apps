@@ -5,10 +5,14 @@ import {
   setProject,
   selectedProject,
   projectSelected,
+  setProjectSelected,
   projectSelectDisabled,
+  projectResetSelection,
+  setResetProjectSelection,
   setMachineLists,
 } from "@/app/features/otsm/otsmSlice";
 import { SelectorProps } from "./_types";
+import { getOtsmMachines } from "@/api/otsmAPI";
 
 const ProjectSelect: FC<SelectorProps> = ({
   toggleDropdown,
@@ -19,6 +23,7 @@ const ProjectSelect: FC<SelectorProps> = ({
   const selectedProjectValue = useAppSelector(selectedProject);
   const projectSelectedvalue = useAppSelector(projectSelected);
   const projectSelectDisabledValue = useAppSelector(projectSelectDisabled);
+  const resetProjectSelectionValue = useAppSelector(projectResetSelection);
 
   useEffectDidMount(() => {
     if (projectSelectedvalue) {
@@ -32,22 +37,52 @@ const ProjectSelect: FC<SelectorProps> = ({
   }, [projectSelectedvalue]);
 
   useEffectDidMount(() => {
-    fetch(
-      `http://${process.env.NEXT_PUBLIC_STRAPI_HOST}:${process.env.NEXT_PUBLIC_STRAPI_PORT}/project-lists/${selectedProjectValue.id}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(data);
-        let lists: any[] = data.machine_lists;
-        if (Array.isArray(lists)) {
-          lists = lists.map((machine) => ({
-            name: machine.machine_name,
+    async function func() {
+      let machines: any[] = [];
+      let result = await getOtsmMachines(selectedProjectValue.id, {
+        populate: "*",
+      });
+      if (result) {
+        machines = result.attributes.otsm_machines.data;
+        if (Array.isArray(machines)) {
+          machines = machines.map((machine) => ({
+            name: machine.attributes.machine_name,
             id: machine.id,
           }));
-          dispatch(setMachineLists(lists));
+          dispatch(setMachineLists(machines));
         }
-      });
+      }
+    }
+    if (selectedProjectValue.id !== 0) {
+      func();
+    }
   }, [selectedProjectValue]);
+
+  useEffectDidMount(() => {
+    if (resetProjectSelectionValue) {
+      resetSelection();
+    }
+  }, [resetProjectSelectionValue]);
+
+  function resetSelection() {
+    // console.log("reset")
+    document
+      .querySelector(".otsm__project.help")
+      ?.classList.replace("is-hide", "is-danger");
+    document
+      .querySelector(".otsm__project.otsm__dropdown__button")
+      ?.classList.replace("is-primary", "is-danger");
+    document
+      .querySelectorAll(".otsm__project.otsm__dropdown__item")
+      .forEach((element) => {
+        element.classList.toggle("is-active", false);
+      });
+    dispatch(
+      setProject({ id: 0, name: "choose one ...", product: "", part: "" })
+    );
+    dispatch(setProjectSelected(false))
+    dispatch(setResetProjectSelection(false));
+  }
 
   return (
     <div className="otsm__selector">
@@ -83,8 +118,10 @@ const ProjectSelect: FC<SelectorProps> = ({
                     toggleContent(e, idx);
                     dispatch(
                       setProject({
-                        name: e.currentTarget.innerHTML,
                         id: item.id,
+                        name: item.name,
+                        product: item.product,
+                        part: item.part,
                       })
                     );
                   }}

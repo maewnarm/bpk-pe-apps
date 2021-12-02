@@ -187,6 +187,7 @@
 }
 
 .otsm__table {
+  --table-radius: 5px;
   width: fit-content;
   * {
     color: $theme-clr-4 !important;
@@ -200,7 +201,8 @@
         color: black;
       }
     }
-    th,td {
+    th,
+    td {
       padding: 0.25rem 0.5rem;
     }
     thead tr {
@@ -209,10 +211,10 @@
           border-bottom-color: $invert-theme-clr-2;
         }
         th:first-child {
-          border-top-left-radius: 10px;
+          border-top-left-radius: var(--table-radius);
         }
         th:last-child {
-          border-top-right-radius: 10px;
+          border-top-right-radius: var(--table-radius);
         }
       }
     }
@@ -222,10 +224,10 @@
       }
       &:last-child {
         td:first-child {
-          border-bottom-left-radius: 10px;
+          border-bottom-left-radius: var(--table-radius);
         }
         td:last-child {
-          border-bottom-right-radius: 10px;
+          border-bottom-right-radius: var(--table-radius);
         }
       }
       &:nth-child(2n + 1) {
@@ -236,27 +238,40 @@
       }
     }
   }
-  &--project thead tr {
-    text-align: center;
-    font-size: 120%;
-    th:nth-child(1) {
-      min-width: 180px;
+  &--project {
+    thead tr {
+      text-align: center;
+      font-size: 120%;
+      th:nth-child(1) {
+        min-width: 180px;
+      }
+      th:nth-child(2) {
+        min-width: 150px;
+      }
+      th:nth-child(3) {
+        min-width: 150px;
+      }
     }
-    th:nth-child(2) {
-      min-width: 150px;
-    }
-    th:nth-child(3) {
-      min-width: 150px;
+    tbody tr {
+      cursor: pointer;
     }
   }
-  &--machine thead tr {
-    text-align: center;
-    font-size: 120%;
-    th:nth-child(2) {
-      min-width: 50px;
+  &--machine {
+    thead tr {
+      text-align: center;
+      font-size: 120%;
+      th:first-child span {
+        cursor: pointer;
+      }
+      th:nth-child(2) {
+        min-width: 50px;
+      }
+      th:nth-child(3) {
+        min-width: 150px;
+      }
     }
-    th:nth-child(3) {
-      min-width: 150px;
+    tbody tr {
+      cursor: default;
     }
   }
 }

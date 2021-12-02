@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useAppSelector } from "@/app/hooks";
-import { machineLists, projectLists } from "@/app/features/otsm/otsmSlice";
-import ProjectSelect from "./_projectSelect";
-import MachineSelect from "./_machineSelect";
-import MachineSignal from "./_signalOperation";
-import TableSetting from "./_tableSetting";
+import ProjectSelect from "@/components/otsm/_projectSelect";
+import MachineSelect from "@/components/otsm/_machineSelect";
+import MachineSignal from "@/components/otsm/_signalOperation";
+import TableSetting from "@/components/otsm/_tableSetting";
 import {
   toggleDropdownIsActive,
   toggleContentIsActiveWithId,
-} from "./_functions";
+} from "@/components/otsm/_functions";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import {
+  machineLists,
+  projectLists,
+  setResetProjectSelection,
+} from "@/app/features/otsm/otsmSlice";
 
 const Otsm = () => {
-  const [currentTab, setCurrentTab] = useState(1);
+  const dispatch = useAppDispatch();
   const projects = useAppSelector(projectLists);
   const machines = useAppSelector(machineLists);
+  const [currentTab, setCurrentTab] = useState(1);
 
   function selectTab(e: React.MouseEvent, tabIndex: number) {
     const tabLists = document.querySelectorAll(".otsm__tabs ul li");
@@ -35,20 +40,25 @@ const Otsm = () => {
     });
   }, [currentTab]);
 
-  function toggleProjectContent(
-    e: React.MouseEvent,
-    index: number,
-    projectId?: number
-  ) {
-    toggleContentIsActiveWithId(e, index);
-    
-  }
+  // function toggleProjectContent(
+  //   e: React.MouseEvent,
+  //   index: number,
+  //   projectId?: number
+  // ) {
+  //   toggleContentIsActiveWithId(e, index);
+  // }
 
   return (
     <div className="otsm">
       <div className="otsm__tabs tabs is-centered">
         <ul>
-          <li className="is-active" onClick={(e) => selectTab(e, 1)}>
+          <li
+            className="is-active"
+            onClick={(e) => {
+              selectTab(e, 1);
+              dispatch(setResetProjectSelection(true));
+            }}
+          >
             <a>
               <span className="icon is-small">
                 <i className="fas fa-wave-square" aria-hidden="true"></i>

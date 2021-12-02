@@ -37,6 +37,7 @@ var subscribedListsArray: string[] = [];
 const MqttConnection: FC<MqttConnectionProps> = (props) => {
   const selectedProjectValue = useAppSelector(selectedProject);
   const selectedMachineValue = useAppSelector(selectedMachine);
+  const machineSelectedValue = useAppSelector(machineSelected);
   const [mqttClient, setMqttClient] = useState<Paho.Client>();
   const [connectionState, setConnectionState] = useState("Not connect");
   const [subscribedLists, setSubscribedLists] = useState<string[]>([]);
@@ -63,7 +64,7 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
           className="button"
           onClick={() => setMQTT()}
           style={{ color: "#80ff00" }}
-          disabled={!(props.projectSelected && machineSelected)}
+          disabled={!(props.projectSelected && machineSelectedValue)}
         >
           <i
             className="fas fa-power-off"
@@ -159,7 +160,7 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
     }
     return () => {
       if (mqttClient && mqttClient.isConnected()) {
-        console.log("out");
+        // console.log("out");
         mqttClient.disconnect();
       }
     };
@@ -177,6 +178,12 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
       `otsm/${selectedProjectValue.name}/${selectedMachineValue.name}/#`
     );
     subscribe(`otsm/${selectedProjectValue.name}/Ready`);
+    if (
+      selectedProjectValue.name === "choose one ..." ||
+      selectedMachineValue.name === "choose one ..."
+    ) {
+      disconnectMQTT();
+    }
   }, [selectedProjectValue, selectedMachineValue]);
 
   const disconnectMQTT = () => {
@@ -220,8 +227,8 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
   };
 
   useEffect(() => {
-    console.log(subscribedListsArray);
-    console.log(subscribedLists);
+    // console.log(subscribedListsArray);
+    // console.log(subscribedLists);
     subscribedListsArray = subscribedLists;
   }, [subscribedLists]);
 
@@ -314,8 +321,8 @@ const MachineSignal = () => {
   }
 
   useEffect(() => {
-    console.log("signalStatus changed");
-    console.log(timerIsRunning);
+    // console.log("signalStatus changed");
+    // console.log(timerIsRunning);
     let haveTimerStopOn = false;
     Object.keys(signalStatus).forEach((signal) => {
       if (signal.includes("stop") && signalStatus[signal] === 1) {
