@@ -42,6 +42,7 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
   const [connectionState, setConnectionState] = useState("Not connect");
   const [subscribedLists, setSubscribedLists] = useState<string[]>([]);
   const onMessageArrived = useRef<(message: Paho.Message) => void>();
+  var localSignalStatus = initialSignalsValue;
 
   const ConnectionButton = () => {
     if (mqttClient && mqttClient.isConnected()) {
@@ -126,15 +127,20 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
           // let topicProject = topic[1]
           // let topicMachine = topic[2]
           let topicSignal = topic[3];
-          // console.log(signalStatus)
-          props.setSignalStatus({
-            ...props.signalStatus,
+          // console.log(localSignalStatus)
+          localSignalStatus = {
+            ...localSignalStatus,
             [topicSignal]: topicValue,
-          });
+          };
+          // props.setSignalStatus({
+          //   ...props.signalStatus,
+          //   [topicSignal]: topicValue,
+          // });
+          props.setSignalStatus(localSignalStatus);
         }
       }
     };
-  }, [props.signalStatus]);
+  }, []);
 
   const connectMQTT = () => {
     // console.log(mqttClient?.isConnected())
@@ -168,6 +174,7 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
 
   useEffectDidMount(() => {
     //reset signalStatus
+    localSignalStatus = initialSignalsValue;
     props.setSignalStatus(initialSignalsValue);
     //unsubscribe all
     subscribedListsArray.forEach((list) => {
@@ -184,6 +191,11 @@ const MqttConnection: FC<MqttConnectionProps> = (props) => {
     ) {
       disconnectMQTT();
     }
+    // set reset signal
+    props.setResetSignal(true);
+    setTimeout(() => {
+      props.setResetSignal(false);
+    }, 300);
   }, [selectedProjectValue, selectedMachineValue]);
 
   const disconnectMQTT = () => {
@@ -294,6 +306,7 @@ const MachineSignal = () => {
   const [signalStatus, setSignalStatus] = useState(initialSignalsValue);
   const [sendSignalStatus, setSendSignalStatus] = useState(initialSignalsValue);
   const [signalReadyStatus, setSignalReadyStatus] = useState(0);
+  const [resetSignal, setResetSignal] = useState(false);
   const [timerIsRunning, setTimerIsRunning] = useState(false);
 
   function toggleSignal(
@@ -348,6 +361,7 @@ const MachineSignal = () => {
         setSendSignalStatus={setSendSignalStatus}
         signalReadyStatus={signalReadyStatus}
         setSignalReadyStatus={setSignalReadyStatus}
+        setResetSignal={setResetSignal}
         projectSelected={projectSelectedValue}
         machineSelected={machineSelectedValue}
       />
@@ -382,6 +396,7 @@ const MachineSignal = () => {
               <Timer
                 startSignal={value === 1 ? true : false}
                 stopSignal={signalReadyStatus === 1 ? true : false}
+                resetSignal={resetSignal}
                 abbrMessage="Timer will stop by 'Ready' signal is ON"
                 returnTimerRunningFlagFunction={setTimerIsRunning}
               />

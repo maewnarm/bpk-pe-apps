@@ -69,9 +69,9 @@ const Otsm = () => {
           <li onClick={(e) => selectTab(e, 2)}>
             <a>
               <span className="icon is-small">
-                <i className="fas fa-cogs" aria-hidden="true"></i>
+                <i className="fas fa-th-list" aria-hidden="true"></i>
               </span>
-              <span>Setting</span>
+              <span>Lists</span>
             </a>
           </li>
         </ul>

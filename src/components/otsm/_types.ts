@@ -22,6 +22,7 @@ export interface MqttConnectionProps {
   setSendSignalStatus: Dispatch<SetStateAction<{ [key: string]: number }>>;
   signalReadyStatus: number;
   setSignalReadyStatus: Dispatch<SetStateAction<number>>;
+  setResetSignal: Dispatch<SetStateAction<boolean>>;
   projectSelected: boolean;
   machineSelected: boolean;
 }

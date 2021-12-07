@@ -56,6 +56,9 @@ const Timer: FC<TimerProps> = (props) => {
     //start signal
     if (props.startSignal) {
       setCount(0);
+      if (timer) {
+        clearTimerInterval();
+      }
       let interval = setInterval(() => {
         if (timerCounter.current) {
           timerCounter.current();
@@ -78,6 +81,13 @@ const Timer: FC<TimerProps> = (props) => {
   }, [props.stopSignal]);
 
   useEffect(() => {
+    //reset signal
+    if (props.resetSignal) {
+      setCount(0);
+    }
+  }, [props.resetSignal]);
+
+  useEffect(() => {
     // const currentTimer = moment(count * 1000)
     let minutes = Math.floor(count / 60);
     let seconds = count - minutes * 60;
@@ -91,7 +101,7 @@ const Timer: FC<TimerProps> = (props) => {
     <div className="timer">
       <abbr title={props.abbrMessage}>
         <p>
-          Timer : <strong>{time}</strong>
+          <strong>{time}</strong>
         </p>
       </abbr>
     </div>
