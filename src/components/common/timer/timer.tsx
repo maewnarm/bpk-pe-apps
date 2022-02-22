@@ -6,7 +6,6 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-// import moment from "moment"
 
 export interface TimerProps {
   startSignal?: boolean;

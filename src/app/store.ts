@@ -1,10 +1,14 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
-import otsmProjectReducer from './features/otsm/otsmSlice'
+import otsmReducer from './features/otsm/otsmSlice'
+import loaderReducer from './features/loader/loaderSlice'
+import isvReducer from './features/isv/isvSlice'
 
 export function makeStore() {
     return configureStore({
         reducer: {
-            otsmProject: otsmProjectReducer
+            otsm: otsmReducer,
+            loader: loaderReducer,
+            isv: isvReducer,
         },
     })
 }

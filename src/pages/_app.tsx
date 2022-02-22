@@ -1,13 +1,16 @@
-import "@/styles/globals.css";
 import "@/styles/main.scss";
 import "@fortawesome/fontawesome-free/css/all.css";
 import "react-toastify/dist/ReactToastify.css";
+import "react-datepicker/dist/react-datepicker.css";
+import 'rc-slider/assets/index.css';
+import 'rc-tooltip/assets/bootstrap.css';
 import Head from "next/head";
 import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
+import { ToastContainer } from "react-toastify";
 import store from "@/app/store";
 import Layout from "@/components/layout/layout";
-import { ToastContainer } from "react-toastify";
+import Loader from "@/components/common/loader/loader";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -31,6 +34,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           draggable
           pauseOnHover
         />
+        <Loader />
       </Layout>
     </Provider>
   );

@@ -1,6 +1,6 @@
 import { useState, FC, CSSProperties, useRef } from "react";
 import useEffectDidMount from "@/hooks/useEffectDidMount";
-import Timer from "@/components/timer/timer";
+import Timer from "@/components/common/timer/timer";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import {
   selectedProject,
@@ -20,18 +20,32 @@ import { useEffect } from "react";
 const host = "127.0.0.1";
 // const host = "broker.emqx.io"
 
-const buttonSignals = [
-  "Home position",
-  "Auto condition",
-  "Auto run",
-  "Cycle stop",
-  "Fault stop",
-  "Emergency stop",
-];
-var initialSignalsValue: { [key: string]: number } = buttonSignals.reduce(
-  (prevVal, curVal) => ({ ...prevVal, [curVal]: 0 }),
-  {}
-);
+// TODO trial operate and see result
+const buttonSignals = {
+  "Pre-condition": [
+    "Home position",
+    "Master/Pokayoke check",
+    "Auto condition",
+    "Auto run",
+    "Cycle stop",
+  ],
+  Setup: ["Tool change", "Part/Material supply", "Interval quality check"],
+  Fault: ["NG fault", "Fault stop (Master on)", "Emergency stop (Master off)"],
+};
+// const buttonSignals = [
+//   "Home position",
+//   "Auto condition",
+//   "Auto run",
+//   "Cycle stop",
+//   "Fault stop",
+//   "Emergency stop",
+// ];
+var initialSignalsValue: { [key: string]: number } = Object.entries(
+  buttonSignals
+).reduce((prevVal, [category, button]) => {
+  let buttonValue = button.reduce((prev, cur) => ({ ...prev, [cur]: 0 }), {});
+  return { ...prevVal, ...buttonValue };
+}, {});
 var subscribedListsArray: string[] = [];
 
 const MqttConnection: FC<MqttConnectionProps> = (props) => {
@@ -365,7 +379,7 @@ const MachineSignal = () => {
         projectSelected={projectSelectedValue}
         machineSelected={machineSelectedValue}
       />
-      <div className="otsm__machine-signal__button__ready">
+      {/* <div className="otsm__machine-signal__button__ready">
         <button
           className={`button is-success ${
             signalReadyStatus === 1 ? "" : "is-outlined"
@@ -377,46 +391,64 @@ const MachineSignal = () => {
         >
           Ready
         </button>
-      </div>
-      <div className="otsm__machine-signal__button">
-        {buttonSignals.map((key, idx) => {
-          let classSet = "button";
-          let bgColor = "#3e8ed055";
-          const value = signalStatus[key];
-          let effectToReady = false;
-          let timer = null;
-          if (value === 0) {
-            classSet += " is-outlined";
-          }
-          if (key.includes("stop")) {
-            classSet += " is-danger";
-            bgColor = "#f1466855";
-            effectToReady = true;
-            timer = (
-              <Timer
-                startSignal={value === 1 ? true : false}
-                stopSignal={signalReadyStatus === 1 ? true : false}
-                resetSignal={resetSignal}
-                abbrMessage="Timer will stop by 'Ready' signal is ON"
-                returnTimerRunningFlagFunction={setTimerIsRunning}
-              />
-            );
-          } else {
-            classSet += " is-info";
-          }
+      </div> */}
+      <div className="otsm__machine-signal__button__group">
+        {/* {buttonSignals.map((key, idx) => { */}
+        {Object.entries(buttonSignals).map(([category, button],index) => {
           return (
-            <div key={idx} className="otsm__machine-signal__button__item">
-              <button
-                className={classSet}
-                onClick={() => toggleSignal(key, value, effectToReady)}
-                disabled={
-                  !(projectSelectedValue && machineSelectedValue && isConnected)
-                }
-                style={{ "--bg-clr": bgColor } as CSSProperties}
-              >
-                {key}
-              </button>
-              {timer}
+            <div key={index}>
+              <p>{category}</p>
+              <div className="otsm__machine-signal__button">
+                {button.map((key, idx) => {
+                  let classSet = "button";
+                  let bgColor = "#3e8ed055";
+                  const value = signalStatus[key];
+                  let effectToReady = false;
+                  let timer = null;
+                  if (value === 0) {
+                    classSet += " is-outlined";
+                  }
+                  // if (key.includes("stop")) {
+                  if (category === "Fault") {
+                    classSet += " is-danger";
+                    bgColor = "#f1466855";
+                    effectToReady = true;
+                    timer = (
+                      <Timer
+                        startSignal={value === 1 ? true : false}
+                        stopSignal={signalReadyStatus === 1 ? true : false}
+                        resetSignal={resetSignal}
+                        abbrMessage="Timer will stop by 'Ready' signal is ON"
+                        returnTimerRunningFlagFunction={setTimerIsRunning}
+                      />
+                    );
+                  } else {
+                    classSet += " is-info";
+                  }
+                  return (
+                    <div
+                      key={idx}
+                      className="otsm__machine-signal__button__item"
+                    >
+                      <button
+                        className={classSet}
+                        onClick={() => toggleSignal(key, value, effectToReady)}
+                        disabled={
+                          !(
+                            projectSelectedValue &&
+                            machineSelectedValue &&
+                            isConnected
+                          )
+                        }
+                        style={{ "--bg-clr": bgColor } as CSSProperties}
+                      >
+                        {key}
+                      </button>
+                      {timer}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           );
         })}

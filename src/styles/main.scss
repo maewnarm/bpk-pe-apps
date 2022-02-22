@@ -1,32 +1,24 @@
 // components
 @use "layout";
+@use "dropdown";
 @use "timer";
+@use "datetimepicker";
 
 // pages
 @use "otsm";
+@use "isv";
 
 // commons
-@import "variables";
+@use "variables";
 
 // libraries
-@import "bulma/css/bulma.css";
+@import "bulma";
+// @import "bulma/css/bulma.css";
+@import "bulma-switch";
+@import "~@creativebulma/bulma-divider";
 
 html {
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    width: 12px;
-    // background-color: rgba($color: #fff, $alpha: 0.2);
-    background-color: $theme-clr-2;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: $theme-clr-2;
-  }
-  &::-webkit-scrollbar-thumb {
-    // background-color: rgba(25, 103, 204, 0.5);
-    background-color: $theme-clr-1;
-    border-radius: 6px;
-    border: 3px solid $theme-clr-2;
-  }
+  overflow-y: hidden;
 }
 
 .index-page {
@@ -40,11 +32,11 @@ html {
 .welcome-message {
   text-align: center;
   p {
-    color: $theme-clr-4;
+    color: var(--theme-clr-4);
     &:first-child {
       font-size: max(2.75vw, 2rem);
       margin-bottom: 0;
-      color: $theme-clr-4;
+      color: var(--theme-clr-4);
     }
     &:last-child {
       font-size: max(2vw, 1.5rem);
@@ -53,7 +45,71 @@ html {
   }
   strong {
     font-size: max(3.5vw, 3.5rem);
-    color: $theme-clr-4;
+    color: var(--theme-clr-4);
     text-shadow: 0 0 15px #ffffff88;
+  }
+}
+
+* {
+  color: var(--theme-clr-4);
+}
+
+.is-hide {
+  display: none !important;
+}
+
+// loader
+.loader-modal.modal {
+  .modal-background {
+    background-color: #ffffff44;
+    backdrop-filter: blur(3px);
+  }
+  .modal-content {
+    display: inline-block;
+    text-align: center;
+    padding: 3rem;
+    background-color: var(--theme-clr-2);
+    border-radius: 0.5rem;
+    span {
+      display: inline-block;
+      vertical-align: middle;
+      text {
+        margin-left: 0.5rem;
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+// custom tooltip
+.custom-tooltip {
+  background-color: white;
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+}
+
+// modify bulma
+.button.is-outlined {
+  &:focus,
+  &:hover {
+    background-color: transparent !important;
+    &.is-primary {
+      color: hsl(171, 100%, 41%);
+    }
+    &.is-link {
+      color: hsl(217, 71%, 53%);
+    }
+    &.is-info {
+      color: hsl(204, 86%, 53%);
+    }
+    &.is-success {
+      color: hsl(141, 71%, 48%);
+    }
+    &.is-warning {
+      color: hsl(48, 100%, 67%);
+    }
+    &.is-danger {
+      color: hsl(348, 100%, 61%);
+    }
   }
 }

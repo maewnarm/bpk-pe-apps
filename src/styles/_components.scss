@@ -1,7 +1,5 @@
-@import "variables";
-
 .timer {
     strong {
-        color: $theme-clr-3;
+        color: var(--theme-clr-3);
     }
 }

@@ -86,22 +86,22 @@ export const {
   setMachineDisable,
 } = otsmSlice.actions;
 
-export const projectLists = (state: AppState) => state.otsmProject.projectLists;
+export const projectLists = (state: AppState) => state.otsm.projectLists;
 export const selectedProject = (state: AppState) =>
-  state.otsmProject.selectedProject;
+  state.otsm.selectedProject;
 export const projectSelected = (state: AppState) =>
-  state.otsmProject.projectSelected;
+  state.otsm.projectSelected;
 export const projectSelectDisabled = (state: AppState) =>
-  state.otsmProject.projectSelectDisabled;
+  state.otsm.projectSelectDisabled;
 export const projectResetSelection = (state: AppState) =>
-  state.otsmProject.resetProjectSelection;
+  state.otsm.resetProjectSelection;
 
-export const machineLists = (state: AppState) => state.otsmProject.machineLists;
+export const machineLists = (state: AppState) => state.otsm.machineLists;
 export const selectedMachine = (state: AppState) =>
-  state.otsmProject.selectedMachine;
+  state.otsm.selectedMachine;
 export const machineSelected = (state: AppState) =>
-  state.otsmProject.machineSelected;
+  state.otsm.machineSelected;
 export const machineSelectDisabled = (state: AppState) =>
-  state.otsmProject.projectSelectDisabled;
+  state.otsm.projectSelectDisabled;
 
 export default otsmSlice.reducer;

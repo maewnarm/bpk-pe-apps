@@ -1,11 +1,12 @@
 {
-    "th": "ไทย",
-    "title":"Title",
-    "menu" : {
-        "home": "Home",
-        "main": "Main",
-        "otsm": "OTSM"
-    },
-    "welcome1": "Welcome to ",
-    "welcome2": "If you have any problem, please contact PE-IT members."
+  "th": "ไทย",
+  "title": "Title",
+  "menu": {
+    "home": "Home",
+    "main": "Main",
+    "otsm": "OTSM",
+    "isv": "ISV"
+  },
+  "welcome1": "Welcome to ",
+  "welcome2": "If you have any problem, please contact PE-IT members."
 }

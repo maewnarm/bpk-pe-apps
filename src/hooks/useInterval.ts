@@ -1,30 +1,36 @@
-import { useRef, useEffect } from "react"
+import { useRef, useEffect } from "react";
 
 const useInterval = (
-    callback: () => void,
-    delay: number,
-    runningSignal?: boolean | undefined
+  callback: () => void,
+  delay: number,
+  runningSignal?: boolean | undefined
 ) => {
-    const savedCallback = useRef<() => void>()
+  const savedCallback = useRef<() => void>();
 
-    useEffect(() => {
-        savedCallback.current = callback
-    }, [callback])
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
 
-    useEffect(() => {
-        function trigger() {
-            if (savedCallback.current && runningSignal) {
-                savedCallback.current()
-            }
-        }
-        let intervalInstance = setInterval(() => {
-            trigger()
-        }, delay)
+  useEffect(() => {
+    function trigger() {
+      if (
+        savedCallback.current &&
+        (runningSignal === true || runningSignal === undefined)
+      ) {
+        savedCallback.current();
+      }
+    }
+    if (delay <= 0 || !runningSignal) {
+      return;
+    }
+    let intervalInstance = setInterval(() => {
+      trigger();
+    }, delay);
 
-        return (() => {
-            clearInterval(intervalInstance)
-        })
-    }, [])
-}
+    return () => {
+      clearInterval(intervalInstance);
+    };
+  }, [delay,runningSignal]);
+};
 
-export default useInterval
+export default useInterval;

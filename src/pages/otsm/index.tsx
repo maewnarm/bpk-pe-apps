@@ -40,14 +40,6 @@ const Otsm = () => {
     });
   }, [currentTab]);
 
-  // function toggleProjectContent(
-  //   e: React.MouseEvent,
-  //   index: number,
-  //   projectId?: number
-  // ) {
-  //   toggleContentIsActiveWithId(e, index);
-  // }
-
   return (
     <div className="otsm">
       <div className="otsm__tabs tabs is-centered">
