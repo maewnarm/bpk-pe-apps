@@ -1,0 +1,25 @@
+.datetime {
+  .react-datepicker__input-container {
+    input {
+      background-color: #ffffff11;
+      border: 1px solid var(--theme-clr-4);
+      border-radius: 0.3rem;
+      padding: 0.3rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+.datepicker-container {
+  padding: 0.3rem;
+  background-color: var(--theme-clr-4-trans);
+  backdrop-filter: blur(2px);
+  border-radius: 0.3rem;
+  * {
+    color: #000;
+  }
+  &__header {
+    background-color: var(--theme-clr-4-darker);
+    text-align: center;
+  }
+}

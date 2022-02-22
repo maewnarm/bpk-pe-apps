@@ -1,0 +1,12 @@
+.timer {
+    abbr {
+        text-decoration: none;
+        text-align: center;
+    }
+    p {
+      font-size: min(10vw,70px);
+    }
+    strong {
+        color: var(--incorrect-clr);
+    }
+}

@@ -1,0 +1,64 @@
+:root {
+  // TODO re-define new color theme
+  --theme-clr-1: hsl(224, 29%, 22%); // bold component
+  --theme-clr-2: hsl(224, 24%, 33%); // background
+  --theme-clr-3: hsl(350, 92%, 59%); // contrast background
+  --theme-clr-4: hsl(195, 50%, 91%); // text
+
+  --theme-clr-1-darker: hsl(224, 29%, 2%);
+  --theme-clr-2-darker: hsl(224, 24%, 13%);
+  --theme-clr-3-darker: hsl(350, 92%, 39%);
+  --theme-clr-4-darker: hsl(195, 50%, 71%);
+
+  --theme-clr-1-lighter: hsl(224, 29%, 42%);
+  --theme-clr-2-lighter: hsl(224, 24%, 53%);
+  --theme-clr-3-lighter: hsl(350, 92%, 79%);
+  --theme-clr-4-lighter: hsl(195, 50%, 100%);
+
+  --theme-clr-1-trans: hsla(224, 29%, 22%, 0.3);
+  --theme-clr-2-trans: hsla(224, 24%, 33%, 0.3);
+  --theme-clr-3-trans: hsla(350, 92%, 59%, 0.3);
+  --theme-clr-4-trans: hsla(195, 50%, 91%, 0.3);
+
+  --invert-theme-clr-1: #d7ceb6;
+  --invert-theme-clr-2: #bfb496;
+  --invert-theme-clr-3: #2b5c54;
+  --invert-theme-clr-: #24120c;
+
+  --correct-clr: #80ff00;
+  --invert-correct-clr: #7f00ff;
+  --incorrect-clr: #ff5f5f;
+  --invert-incorrect-clr: #00a0a0;
+}
+
+:root[data-theme="Light"] {
+  --theme-clr-1: hsl(34, 63%, 32%);
+  --theme-clr-2: hsl(34, 64%, 98%);
+  --theme-clr-3: hsl(0, 0%, 21%);
+  --theme-clr-4: hsl(0, 0%, 10%);
+
+  --theme-clr-1-darker: hsl(33, 67%, 74%);
+  --theme-clr-2-darker: hsl(34, 64%, 97%);
+  --theme-clr-3-darker: hsl(136, 26%, 72%);
+  --theme-clr-4-darker: hsl(0, 0%, 0%);
+
+  --theme-clr-1-lighter: hsl(35, 78%, 87%);
+  --theme-clr-2-lighter: hsl(30, 75%, 92%);
+  --theme-clr-3-lighter: hsl(137, 50%, 89%);
+  --theme-clr-4-lighter: hsl(0, 0%, 30%);
+
+  --theme-clr-1-trans: hsla(33, 67%, 94%, 0.3);
+  --theme-clr-2-trans: hsla(34, 64%, 98%, 0.3);
+  --theme-clr-3-trans: hsla(136, 26%, 92%, 0.3);
+  --theme-clr-4-trans: hsla(0, 0%, 10%, 0.3);
+
+  --invert-theme-clr-1: #050e19;
+  --invert-theme-clr-2: #020509;
+  --invert-theme-clr-3: #1b1018;
+  --invert-theme-clr-: #ededed;
+
+  --correct-clr: #3e7c00;
+  --invert-correct-clr: #c183ff;
+  --incorrect-clr: #ff5f5f;
+  --invert-incorrect-clr: #00a0a0;
+}
