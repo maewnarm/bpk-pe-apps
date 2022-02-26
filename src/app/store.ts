@@ -2,6 +2,7 @@ import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 import otsmReducer from './features/otsm/otsmSlice'
 import loaderReducer from './features/loader/loaderSlice'
 import isvReducer from './features/isv/isvSlice'
+import qarReducer from './features/qar/qarSlice'
 
 export function makeStore() {
     return configureStore({
@@ -9,6 +10,7 @@ export function makeStore() {
             otsm: otsmReducer,
             loader: loaderReducer,
             isv: isvReducer,
+            qar: qarReducer
         },
     })
 }

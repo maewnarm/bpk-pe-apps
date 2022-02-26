@@ -88,6 +88,7 @@ const Navbar = () => {
         <Link href="/main">{t("menu.main")}</Link>
         <Link href="/otsm">{t("menu.otsm")}</Link>
         <Link href="/isv">{t("menu.isv")}</Link>
+        <Link href="/qar">{t("menu.qar")}</Link>
       </div>
       <div className="navbar__options">
         <div className="navbar__options__language">{LanguageBtn()}</div>
