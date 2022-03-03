@@ -2,10 +2,15 @@
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 import PDFObject from "pdfobject";
-import { addFontStyle, drawRecordForm } from "@/components/qar/_functions";
+import html2canvas from "html2canvas";
+import {
+  addFontStyle,
+  drawRecordForm1,
+  drawImage,
+} from "@/components/qar/_functions";
 
 const Qar = () => {
-  function generatePDF() {
+  async function generatePDF() {
     console.log("generate pdf");
     //initial size
     const doc = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
@@ -14,8 +19,19 @@ const Qar = () => {
     addFontStyle(doc);
 
     // draw
-    drawRecordForm(doc);
+    drawRecordForm1(doc);
     console.log(doc.getFontList());
+
+    // add image
+    const img = new Image();
+    img.src = "denso-vector-logo.svg";
+    img.setAttribute("width", "250");
+    img.setAttribute("height", "95");
+    img.style.position = "relative";
+    img.style.left = "0";
+    img.style.padding = "0";
+    img.style.top = window.innerHeight.toString();
+    drawImage(doc, img);
 
     // doc.save("test.pdf");
     // window.open(URL.createObjectURL(doc.output("blob")));
