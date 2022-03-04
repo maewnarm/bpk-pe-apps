@@ -6,7 +6,8 @@
     "main": "Main",
     "otsm": "OTSM",
     "isv": "ISV",
-    "qar": "Quality Auto Record"
+    "qar": "Quality Auto Record",
+    "ev": "EV"
   },
   "welcome1": "Welcome to ",
   "welcome2": "If you have any problem, please contact PE-IT members."

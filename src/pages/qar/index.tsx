@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 import PDFObject from "pdfobject";
-import html2canvas from "html2canvas";
+// import html2canvas from "html2canvas";
 import {
   addFontStyle,
   drawRecordForm1,
