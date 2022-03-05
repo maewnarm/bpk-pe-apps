@@ -5,6 +5,7 @@ import PDFObject from "pdfobject";
 import {
   Color,
   degrees,
+  PageSizes,
   PDFDocument,
   PDFFont,
   PDFPage,
@@ -20,9 +21,9 @@ import {
   loadFont,
 } from "@/components/qar/_functions";
 
-var defaultFont: PDFFont
-var defaultSize: number = 20
-var defaultColor: Color = rgb(0,0,0)
+var defaultFont: PDFFont;
+var defaultSize: number = 20;
+var defaultColor: Color = rgb(0, 0, 0);
 
 const Qar = () => {
   async function generatePDF() {
@@ -71,17 +72,30 @@ const Qar = () => {
         const pdfBytesFromLocal = await res.arrayBuffer();
         console.log(pdfBytesFromLocal);
         const doc = await PDFDocument.load(pdfBytesFromLocal);
+        // const doc = await PDFDocument.create()
         const pages = doc.getPages();
         const firstPage = pages[0];
+        // const firstPage = doc.addPage(PageSizes.A4);
         const { width, height } = firstPage.getSize();
+        console.log("h:", height, "w:", width);
 
         // embed font
         doc.registerFontkit(fontkit);
         const angsanaUPC = await doc.embedFont(await loadFont("angsa.ttf"));
+        const angsanaUPCz = await doc.embedFont(await loadFont("angsaz.ttf"));
+        const wingding2 = await doc.embedFont(await loadFont("WINGDNG2.ttf"));
 
-        defaultFont = angsanaUPC
+        defaultFont = angsanaUPC;
 
-        pdfDrawText(firstPage,"test add text",100,200)
+        pdfDrawText(firstPage, "test add text", 100, 200);
+
+        defaultFont = angsanaUPCz;
+        pdfDrawText(firstPage, "test add text 2", 100, 220);
+
+        defaultFont = wingding2;
+        let textHeight = wingding2.heightAtSize(50);
+        pdfDrawText(firstPage, "P", 100, height - textHeight, 50);
+
         // firstPage.drawText("Test add text", {
         //   x: 10,
         //   y: height / 2,
