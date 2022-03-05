@@ -2,12 +2,27 @@
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 import PDFObject from "pdfobject";
-import html2canvas from "html2canvas";
+import {
+  Color,
+  degrees,
+  PDFDocument,
+  PDFFont,
+  PDFPage,
+  rgb,
+  StandardFonts,
+} from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+// import html2canvas from "html2canvas";
 import {
   addFontStyle,
   drawRecordForm1,
   drawImage,
+  loadFont,
 } from "@/components/qar/_functions";
+
+var defaultFont: PDFFont
+var defaultSize: number = 20
+var defaultColor: Color = rgb(0,0,0)
 
 const Qar = () => {
   async function generatePDF() {
@@ -48,10 +63,109 @@ const Qar = () => {
     });
   }
 
+  async function modifyPDF() {
+    fetch("http://127.0.0.1:70/pcs-controlitem.pdf", {
+      headers: { "Content-Type": "application/pdf" },
+    })
+      .then(async (res) => {
+        const pdfBytesFromLocal = await res.arrayBuffer();
+        console.log(pdfBytesFromLocal);
+        const doc = await PDFDocument.load(pdfBytesFromLocal);
+        const pages = doc.getPages();
+        const firstPage = pages[0];
+        const { width, height } = firstPage.getSize();
+
+        // embed font
+        doc.registerFontkit(fontkit);
+        const angsanaUPC = await doc.embedFont(await loadFont("angsa.ttf"));
+
+        defaultFont = angsanaUPC
+
+        pdfDrawText(firstPage,"test add text",100,200)
+        // firstPage.drawText("Test add text", {
+        //   x: 10,
+        //   y: height / 2,
+        //   size: 30,
+        //   font: angsanaUPC,
+        //   color: rgb(1, 0, 0),
+        // });
+        firstPage.drawText("Test add text", {
+          x: 10,
+          y: 20,
+          size: 30,
+          // font: angsanaUPC,
+          color: rgb(1, 0, 0),
+        });
+        firstPage.drawRectangle({
+          x: 0,
+          y: height / 2 - 25,
+          width: 50,
+          height: 50,
+          borderColor: rgb(1, 0, 0),
+          color: rgb(0, 1, 0),
+          borderWidth: 2,
+        });
+        const uri = await doc.saveAsBase64({ dataUri: true });
+
+        PDFObject.embed(uri, "#pdfembed", {
+          height: "700px",
+          pdfOpenParams: {
+            view: "FitH",
+          },
+        });
+      })
+      .catch((e) => console.log(e));
+  }
+
+  function pdfDrawText(
+    page: PDFPage,
+    text: string,
+    x: number,
+    y: number,
+    size: number = defaultSize,
+    font: PDFFont = defaultFont,
+    color: Color = defaultColor
+  ) {
+    page.drawText(text, {
+      x: x,
+      y: y,
+      size: size,
+      font: font,
+      color: color,
+    });
+  }
+
+  function uploadFile() {
+    const input = document.getElementById("fileinput") as HTMLInputElement;
+    const files = input.files;
+    if (files) {
+      let file = files[0];
+      const formData = new FormData();
+      formData.append("File", file);
+      // TODO method not allow
+      fetch("http://127.0.0.1:70/pcs-test.pdf", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          console.log(result);
+        })
+        .catch((e) => console.log(e));
+    }
+  }
+
   return (
     <div className="qar">
       <button className="button" onClick={generatePDF}>
         trial generate pdf
+      </button>
+      <input id="fileinput" type="file"></input>
+      <button className="button" onClick={uploadFile}>
+        upload
+      </button>
+      <button className="button" onClick={modifyPDF}>
+        trial modify pdf
       </button>
       <div id="pdfembed" style={{ height: "700px", width: "500px" }}></div>
     </div>

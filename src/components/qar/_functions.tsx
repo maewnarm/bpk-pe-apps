@@ -9,6 +9,7 @@ import { font_angsana_upc_normal } from "@/public/fonts/angsana upc-normal";
 import { font_angsana_upc_bold } from "@/public/fonts/angsana upc-bold";
 import { font_angsana_upc_italic } from "@/public/fonts/angsana upc-italic";
 import { font_angsana_upc_bolditalic } from "@/public/fonts/angsana upc-bolditalic";
+// import { PDFDocument } from "pdf-lib";
 
 export function drawImage(doc: jsPDF, img: HTMLImageElement) {
   document.body.appendChild(img);
@@ -161,4 +162,11 @@ export function drawRecordForm1(doc: jsPDF) {
   doc.rect(110, 147, 95, 70.5); //Record sheet Table#2
   doc.rect(5, 220, 95, 70.5); //Record sheet Table#3
   doc.rect(110, 147, 95, 70.5); //Record sheet Table#4
+}
+
+export async function loadFont(fontName: string) {
+  const fontBytes = await fetch(`http://127.0.0.1:70/fonts/${fontName}`).then(
+    (res) => res.arrayBuffer()
+  );
+  return fontBytes;
 }
